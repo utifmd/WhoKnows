@@ -1,5 +1,6 @@
 package com.utflnx.whokonws.ui.quiz;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,8 @@ import com.utflnx.whokonws.model.QuizModel;
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.repo.participant.ParticipateRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
+import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
+import com.utflnx.whokonws.ui.room.publicity.RoomFragment;
 
 import java.io.Serializable;
 import java.util.List;
@@ -156,9 +159,11 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         if (currentRoomModel.getRoomId() != null) mPresenter.getRoomQuizList(currentRoomModel);
     }
 
-    private void clearSetup(View view){
+    private void clearSetup(View view, String tag){
         ListObjects.visibleGoneView(new View[]{}, contentTake, contentCreate);
-        ListObjects.fragmentManager(mContext).popBackStack();
+
+        if (tag != null) ListObjects.fragmentManager(mContext).popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        else ListObjects.fragmentManager(mContext).popBackStack();
     }
 
     private void onOptionsChanged(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
@@ -234,13 +239,14 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     public void onOwnerQuizRemoteSaved(QuizModel quizModel) {
         Log.d(TAG, "onQuizRemoteSaved");
 
-        clearSetup(rootView);
+        clearSetup(rootView, null);
     }
 
     @Override
     public void onFinishParticipantTakenQuiz(ParticipantModel participantModel) { // participant already updated.
         Log.d(TAG, "onFinishParticipantTakenQuiz");
 
+        clearSetup(rootView, new RoomOwnerFragment().toString());
     }
 
     @Override

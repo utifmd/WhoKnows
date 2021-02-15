@@ -24,8 +24,8 @@ public interface RoomMainContract {
     interface View extends BaseView<RoomMainContract.Presenter> {
         void onRoomLocalLoaded(RoomModel roomModel);
         void onRoomRemoteLoaded(RoomModel roomModel);
-        void onParticipantRemoteLoaded(ParticipantModel participantModel);
         void onRoomEmpty();
+        void onExistParticipation(ParticipantModel participantModels);
         void onExpiredParticipate();
         void onParticipantEmpty();
         void onQuestionsEmpty();

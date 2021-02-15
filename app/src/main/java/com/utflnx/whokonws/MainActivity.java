@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.ui.dashboard.DashboardFragment;
+import com.utflnx.whokonws.ui.profile.ProfileFragment;
+import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
 
 
 // TODO: 03/02/21
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG, "onCreate()");
+
         ListObjects.navigateTo(this, new DashboardFragment(), false).commit();
     }
 }

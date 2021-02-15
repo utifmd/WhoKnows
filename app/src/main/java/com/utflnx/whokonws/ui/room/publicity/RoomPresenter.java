@@ -74,7 +74,7 @@ public class RoomPresenter implements RoomMainContract.Presenter {
             @Override
             public void onQuizListLoaded(List<QuizModel> quizModelList) {
                 mView.onRoomRemoteLoaded(roomModel);
-                mView.onProgressHide();
+                //mView.onProgressHide();
             }
 
             @Override
@@ -108,7 +108,7 @@ public class RoomPresenter implements RoomMainContract.Presenter {
             @Override
             public void onRoomLoaded(RoomModel roomModel) {
                 mView.onRoomLocalLoaded(roomModel);
-                mView.onProgressHide();
+                //mView.onProgressHide();
             }
 
             @Override
@@ -129,13 +129,13 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     public void displayCurrentParticipate(RoomModel roomModel) {
         mParticipateRepository.getCurrentParticipate(roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
             @Override
-            public void onCurrentParticipate(ParticipantModel participantModel) {
-                mView.onParticipantRemoteLoaded(participantModel);
+            public void onParticipateExist(ParticipantModel participantModels) {
+                mView.onExistParticipation(participantModels);
                 mView.onProgressHide();
             }
 
             @Override
-            public void onExpiredParticipate() {
+            public void onParticipateExpired() {
                 mView.onExpiredParticipate();
                 mView.onProgressHide();
             }

@@ -37,15 +37,34 @@ public class ParticipateRemote implements ParticipantDataContract {
             @Override
             public void onResponse(Call<List<ParticipantModel>> call, Response<List<ParticipantModel>> response) {
                 if (response.body() != null){
-                    if (response.body().size() != 0) {
+                    if (response.body().size() == 0){
+                        participantCallback.onEmptyParticipant();
+                    }else {
                         for (ParticipantModel model: response.body()){
-                            if (!model.isExpired()) participantCallback.onCurrentParticipate(model);
-                            else participantCallback.onExpiredParticipate();
+                            if (model.getRoomId().equals(roomModel.getRoomId()) && !model.isExpired())
+                                participantCallback.onParticipateExist(model);
+
+                            else if (model.getRoomId().equals(roomModel.getRoomId()) && model.isExpired())
+                                participantCallback.onParticipateExpired();
 
                             break;
                         }
-                    } else
-                        participantCallback.onEmptyParticipant();
+                    }
+//                    if (response.body().size() != 0) {
+//                        for (ParticipantModel model: response.body()){ //fix logic when
+//                            if (model.getRoomId().equals(roomModel.getRoomId()) && !model.isExpired())
+//                                participantCallback.onCurrentParticipate(model);
+//
+//                            else if (model.getRoomId().equals(roomModel.getRoomId()) && model.isExpired())
+//                                participantCallback.onParticipateExpired();
+//
+//                            else if (model.getRoomId().equals(roomModel.getRoomId()))
+//                                participantCallback.onParticipateExist(model);
+//
+//                            break;
+//                        }
+//                    } else
+//                        participantCallback.onEmptyParticipant();
                 }
             }
 

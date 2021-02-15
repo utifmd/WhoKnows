@@ -10,8 +10,8 @@ public interface ParticipantDataContract {
     void updateCurrentParticipant(ParticipantModel participantModel, ActionParticipantCallback actionParticipantCallback);
 
     interface LoadedParticipantCallback{
-        void onCurrentParticipate(ParticipantModel participantModels);
-        void onExpiredParticipate();
+        void onParticipateExist(ParticipantModel participantModels);
+        void onParticipateExpired();
         void onEmptyParticipant();
         void onError(Throwable t);
     }

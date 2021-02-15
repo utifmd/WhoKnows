@@ -49,11 +49,16 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private Button btnJoinRoom, btnAddRoomQuiz, btnTakeRoom;
 
     private RoomModel currentRoomModel = null;
+    private ParticipantModel currentParticipantModel = null;
     private int mQuestionSize = 0;
     private boolean isStateByOwner = false;
 
     private RoomAdapter roomAdapter;
     private RecyclerView recyclerView;
+
+    private final int KEY_ROOM_GENERAL = 0;
+    private final int KEY_ROOM_CONTINUE = 1;
+    private final int KEY_ROOM_FINISH = 2;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -140,15 +145,23 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         btnJoinRoom.setOnClickListener(this::joinRoom);
     }
 
-    private void displayPublicRoom(boolean isDone){
+    private void displayPublicRoom(int state){
         ListObjects.visibleGoneView(new View[]{contentPublicRoom}, contentJoin, contentList);
 
-        if (isDone) {
-            btnTakeRoom.setEnabled(false); //btnTakeRoom.setOnClickListener(this::navigateToQuiz);
-            btnTakeRoom.setText(R.string.finish);
-        } else {
-            btnTakeRoom.setEnabled(true);
-            btnTakeRoom.setOnClickListener(this::takeTheRoom);
+        switch (state){
+            case KEY_ROOM_GENERAL:
+                btnTakeRoom.setEnabled(true);
+                btnTakeRoom.setOnClickListener(this::takeTheRoom);
+                break;
+            case KEY_ROOM_CONTINUE:
+                btnTakeRoom.setEnabled(true);
+                btnTakeRoom.setText(R.string._continue);
+                btnTakeRoom.setOnClickListener(v -> navigateToQuiz(currentRoomModel, currentParticipantModel));
+                break;
+            case KEY_ROOM_FINISH:
+                btnTakeRoom.setEnabled(false); //btnTakeRoom.setOnClickListener(this::navigateToQuiz);
+                btnTakeRoom.setText(R.string.finish);
+                break;
         }
 
         btnCloseContent.setOnClickListener(this::signOutOverRoom);
@@ -209,54 +222,20 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onRoomLocalLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
-        Log.d(TAG, "onRoomLocalLoaded()");
-
-        //Snackbar.make(rootView, "You already join the "+ roomModel.getTitle()+" room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
-
-        displayParticipation(roomModel, true);
-    }
-
-    @Override
     public void onRoomRemoteLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
         Log.d(TAG, "onRoomRemoteLoaded()");
         mPresenter.saveCurrentRoom(roomModel);
+        setHeaderRoom(roomModel);
 
-        Snackbar.make(rootView, "Successfully join the "+ roomModel.getTitle()+" room.", Snackbar.LENGTH_LONG).show();
-
-        displayParticipation(roomModel, false);
+        mPresenter.displayCurrentParticipate(roomModel);
     }
 
-    private void displayParticipation(RoomModel roomModel, boolean isLocal){
+    @Override
+    public void onRoomLocalLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
+        Log.d(TAG, "onRoomLocalLoaded()");
         mContext.runOnUiThread(() -> setHeaderRoom(roomModel));
 
-       if (isLocal) mPresenter.displayCurrentParticipate(roomModel);
-       else displayPublicRoom(false);
-    }
-
-    @Override
-    public void onParticipantRemoteLoaded(ParticipantModel participantModel) {
-        Log.d(TAG, "onParticipantRemoteLoaded");
-
-        Snackbar.make(rootView, "You already participate for the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
-
-        displayPublicRoom(false);
-    }
-
-    @Override
-    public void onParticipantEmpty() {
-        Log.d(TAG, "onParticipantEmpty");  //6fcb5d7e-a85b-40c5-894c-874977982c54
-
-        displayPublicRoom(false); // if (currentRoomModel != null) mPresenter.displayCurrentRoom();
-    }
-
-    @Override
-    public void onExpiredParticipate() {
-        Log.d(TAG, "onExpiredParticipate");
-
-        Snackbar.make(rootView, "Thank you for participation!", Snackbar.LENGTH_LONG).show();
-
-        displayPublicRoom(true);
+        mPresenter.displayCurrentParticipate(roomModel);
     }
 
     @Override
@@ -272,7 +251,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onRoomTakenSaved(ParticipantModel participantModel) { // currentParticipantModel = participantModel;
+    public void onRoomTakenSaved(ParticipantModel participantModel) { currentParticipantModel = participantModel;
         Log.d(TAG, "onRoomTakenSaved()"); //mPresenter.saveCurrentParticipant(participantModel);
 
         if(currentRoomModel != null) navigateToQuiz(currentRoomModel, participantModel);
@@ -286,9 +265,8 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         if (isStateByOwner)
             displayOwnerList(quizModelList);
         else
-            displayPublicRoom(true);
+            displayPublicRoom(KEY_ROOM_CONTINUE);
     }
-
 
     @Override
     public void onQuestionsEmpty() {
@@ -302,6 +280,34 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onItemQuizSelected(QuizModel quizModel) {
         Log.d(TAG, "onItemQuizSelected "+ quizModel.getQuizId());
     }
+
+    @Override
+    public void onExistParticipation(ParticipantModel participantModels) { currentParticipantModel = participantModels;
+        Log.d(TAG, "onExistParticipation");
+
+        Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+
+        displayPublicRoom(KEY_ROOM_CONTINUE);
+    }
+
+    @Override
+    public void onExpiredParticipate() {
+        Log.d(TAG, "onExpiredParticipate");
+
+        Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
+
+        displayPublicRoom(KEY_ROOM_FINISH);
+    }
+
+    @Override
+    public void onParticipantEmpty() {
+        Log.d(TAG, "onParticipantEmpty");  //6fcb5d7e-a85b-40c5-894c-874977982c54
+
+        Snackbar.make(rootView, "Welcome to the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+
+        displayPublicRoom(KEY_ROOM_GENERAL);
+    }
+
 
     @Override
     public void onError(Throwable t) {
