@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <include android:id="@+id/contentSubmit"
+        android:visibility="gone"
+        layout="@layout/fragment_room_submit"/>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/contentList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:ignore="HardcodedText">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mainRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_post"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="150dp"
+            app:fabSize="mini"
+            android:src="@drawable/ic_round_add_transparent_24"
+            app:layout_anchor="@id/fab_find"
+            app:layout_anchorGravity="top|center"
+            android:contentDescription="@string/app_name" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_find"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="90dp"
+            app:fabSize="mini"
+            android:src="@drawable/ic_baseline_group_add_24"
+            app:layout_anchor="@id/fab_extend"
+            app:layout_anchorGravity="top|center"
+            android:contentDescription="@string/app_name" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fab_extend"
+            style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="@string/menu"
+            app:layout_anchor="@id/mainRecyclerView"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:layout_anchorGravity="bottom|center"
+            android:contentDescription="@string/appbar_scrolling_view_behavior"
+            app:icon="@drawable/ic_baseline_menu_24"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:padding="16dp"
+        android:layout_height="wrap_content">
+        <TextView android:text="@string/question"
+            android:textSize="16sp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/textQuestion"
+            style="@style/TextAppearance.AppCompat.Display1"
+            android:text="@string/find_room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView android:text="@string/answer"
+            android:textSize="16sp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_a"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"/>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_b"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"/>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_c"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"/>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_d"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"/>
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_e"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_next"
+            android:text="@string/next"
+            android:layout_marginVertical="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>
