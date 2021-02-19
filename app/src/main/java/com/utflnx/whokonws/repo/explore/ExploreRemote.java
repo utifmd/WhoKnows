@@ -26,7 +26,7 @@ public class ExploreRemote implements ExploreDataContract {
     @Override
     public void getUsers(LoadedExploreCallback loadedExploreCallback) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_ONLY, new String[]{ListObjects.TABLE_USER}, null, null);
+                ListObjects.ABOUT_FETCH_ONLY, new String[]{ListObjects.TABLE_USER}, null, null, null);
 
         mRemoteService.getAllUsers(APIRequestModel).enqueue(new Callback<List<UserModel>>() {
             @Override
@@ -47,7 +47,7 @@ public class ExploreRemote implements ExploreDataContract {
     @Override
     public void postUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null);
+                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null, null);
 
         mRemoteService.postUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -68,7 +68,7 @@ public class ExploreRemote implements ExploreDataContract {
     @Override
     public void deleteUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_DELETE, new String[]{ListObjects.TABLE_USER}, userModel, null);
+                ListObjects.ABOUT_DELETE, new String[]{ListObjects.TABLE_USER}, userModel, null, null);
 
         mRemoteService.deleteUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -89,7 +89,7 @@ public class ExploreRemote implements ExploreDataContract {
     @Override
     public void updateUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_USER}, userModel,"userId = "+ userModel.getUserId());
+                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null,"userId = "+ userModel.getUserId());
 
         mRemoteService.updateUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override

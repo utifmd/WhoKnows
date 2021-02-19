@@ -29,7 +29,7 @@ public class QuizRemote implements QuizDataContract {
     @Override
     public void postQuizRemote(QuizModel quizModel, ActionQuizCallback callback) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_QUIZ}, quizModel, null);
+                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_QUIZ}, quizModel, null, null);
 
         remoteService.postQuizRoom(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -52,7 +52,8 @@ public class QuizRemote implements QuizDataContract {
         HashMap<String, String> container = new HashMap<>();
         container.put("roomId", roomModel.getRoomId());
 
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_FETCH_JOIN_BY, new String[]{ListObjects.TABLE_QUIZ, ListObjects.TABLE_ROOM}, container, null);
+        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
+                ListObjects.ABOUT_FETCH_JOIN_BY, new String[]{ListObjects.TABLE_QUIZ, ListObjects.TABLE_ROOM}, container, null, null);
 
         remoteService.getRoomQuizList(APIRequestModel).enqueue(new Callback<List<QuizModel>>() {
             @Override

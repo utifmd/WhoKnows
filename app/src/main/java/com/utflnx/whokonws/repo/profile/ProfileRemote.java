@@ -30,7 +30,7 @@ public class ProfileRemote implements ProfileDataContract {
         customContainer.put(userModel.getEmail(), userModel.getPassword());
 
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SIGN_IN, new String[]{ListObjects.TABLE_USER}, customContainer, null);
+                ListObjects.ABOUT_FETCH_SIGN_IN, new String[]{ListObjects.TABLE_USER}, customContainer, null, null);
 
         mRemoteService.getUser(APIRequestModel).enqueue(new Callback<List<UserModel>>() {
             @Override
@@ -51,7 +51,7 @@ public class ProfileRemote implements ProfileDataContract {
     @Override
     public void postRemoteProfile(UserModel userModel, ActionProfileCallBack callBack) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null);
+                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null, null);
 
         mRemoteService.postUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -72,7 +72,7 @@ public class ProfileRemote implements ProfileDataContract {
     @Override
     public void updateUser(UserModel currentUserModel, ActionProfileCallBack callBack) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_USER}, currentUserModel, "userId = "+ currentUserModel.getUserId());
+                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_USER}, currentUserModel, null, "userId = "+ currentUserModel.getUserId());
 
         mRemoteService.updateUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -91,7 +91,7 @@ public class ProfileRemote implements ProfileDataContract {
     @Override
     public void deleteRemoteUser(UserModel currentUserModel, ActionProfileCallBack callBack) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_DELETE, new String[]{ListObjects.TABLE_USER}, currentUserModel,"userId = "+ currentUserModel.getUserId());
+                ListObjects.ABOUT_DELETE, new String[]{ListObjects.TABLE_USER}, currentUserModel, null,"userId = "+ currentUserModel.getUserId());
 
         mRemoteService.updateUser(APIRequestModel).enqueue(new Callback<String>() {
             @Override

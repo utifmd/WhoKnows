@@ -8,6 +8,7 @@ import com.utflnx.whokonws.api.service.RemoteService;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.APIRequestModel;
 import com.utflnx.whokonws.model.ParticipantModel;
+import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
 
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class ParticipateRemote implements ParticipantDataContract {
         container.put("userId", roomModel.getUserId());
 
         APIRequestModel requestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ ListObjects.TABLE_PARTICIPANT }, container, null);
+                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ ListObjects.TABLE_PARTICIPANT }, container, null, null);
 
         remoteService.getParticipantBy(requestModel).enqueue(new Callback<List<ParticipantModel>>() {
             @Override
@@ -50,21 +51,6 @@ public class ParticipateRemote implements ParticipantDataContract {
                             break;
                         }
                     }
-//                    if (response.body().size() != 0) {
-//                        for (ParticipantModel model: response.body()){ //fix logic when
-//                            if (model.getRoomId().equals(roomModel.getRoomId()) && !model.isExpired())
-//                                participantCallback.onCurrentParticipate(model);
-//
-//                            else if (model.getRoomId().equals(roomModel.getRoomId()) && model.isExpired())
-//                                participantCallback.onParticipateExpired();
-//
-//                            else if (model.getRoomId().equals(roomModel.getRoomId()))
-//                                participantCallback.onParticipateExist(model);
-//
-//                            break;
-//                        }
-//                    } else
-//                        participantCallback.onEmptyParticipant();
                 }
             }
 
@@ -76,27 +62,27 @@ public class ParticipateRemote implements ParticipantDataContract {
     }
 
     @Override
-    public void updateCurrentParticipant(ParticipantModel participantModel, ActionParticipantCallback actionParticipantCallback) {
+    public void updateCurrentParticipant(ParticipantModel participantModel, ResultModel resultModel, ActionParticipantCallback actionParticipantCallback) {
         participantModel.setExpire(true);
         APIRequestModel requestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ ListObjects.TABLE_PARTICIPANT }, participantModel,
+                ListObjects.ABOUT_UPDATE_POST_COUPLE,
+                new String[]{ ListObjects.TABLE_PARTICIPANT, ListObjects.TABLE_RESULT },
+                participantModel, resultModel,
                 "participantId = '"+participantModel.getParticipantId()+"'"
         );
-
-        Log.d(TAG, participantModel.toString());
 
         remoteService.updateParticipant(requestModel).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.body() != null)
-                    actionParticipantCallback.onParticipantResponse(participantModel);
+                    actionParticipantCallback.onParticipantResponse(participantModel, resultModel);
                 else
                     actionParticipantCallback.onError(new Throwable("Invalid server request."));
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                actionParticipantCallback.onError(t);
             }
         });
     }

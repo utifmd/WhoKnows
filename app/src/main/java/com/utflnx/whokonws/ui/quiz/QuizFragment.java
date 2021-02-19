@@ -1,6 +1,5 @@
 package com.utflnx.whokonws.ui.quiz;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,13 +23,16 @@ import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.QuizModel;
+import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.participant.ParticipateRepository;
+import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
-import com.utflnx.whokonws.ui.room.publicity.RoomFragment;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,18 +48,24 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     private QuizMainContract.Presenter mPresenter;
     private QuizRepository mRepository;
     private ParticipateRepository mParticipateRepository;
+    private ProfileRepository mProfileRepository;
     private View rootView, contentCreate, contentTake;
     private TextView textQuestion;
     private MaterialCheckBox checkOptA, checkOptB, checkOptC, checkOptD, checkOptE;
     private Button btnNext;
     private TextInputLayout inpQuestion, inpOptA, inpOptB, inpOptC, inpOptD, inpOptE;
 
+
+    private UserModel currentUser = null;
     private RoomModel currentRoomModel = null;
     private ParticipantModel currentParticipantModel = null;
-    private String selectedAnswer;
+    private List<QuizModel> currentQuizModelList = null;
+    private String creatorSelectedAnswer;
     private int mViewType;
     private int viewPageSum = 0;
     private int viewPage = 0;
+    private List<String> correctAnswer = new ArrayList<>();
+    private List<String> wrongAnswer = new ArrayList<>();
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -66,13 +74,14 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         mContext = (FragmentActivity) context;
         mRepository = new QuizRepository(context);
         mParticipateRepository = new ParticipateRepository(context);
+        mProfileRepository = new ProfileRepository(context);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        new QuizPresenter(this, mRepository, mParticipateRepository);
+        new QuizPresenter(this, mRepository, mParticipateRepository, mProfileRepository);
 
         if (getArguments() != null) {
             Serializable roomModel = getArguments().getSerializable(KEY_ROOM_FRAGMENT);
@@ -157,24 +166,25 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     private void setUpTakeRoom() {
         ListObjects.visibleGoneView(new View[]{contentTake}, contentCreate);
         if (currentRoomModel.getRoomId() != null) mPresenter.getRoomQuizList(currentRoomModel);
+
+        recursiveCheckBoxes(0);
     }
 
-    private void clearSetup(View view, String tag){
+    private void clearSetup(View view){
         ListObjects.visibleGoneView(new View[]{}, contentTake, contentCreate);
 
-        if (tag != null) ListObjects.fragmentManager(mContext).popBackStack(tag, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        else ListObjects.fragmentManager(mContext).popBackStack();
+        ListObjects.fragmentManager(mContext).popBackStack();
     }
 
     private void onOptionsChanged(MaterialButtonToggleGroup group, int checkedId, boolean isChecked) {
-        selectedAnswer = ((Button)rootView.findViewById(checkedId)).getText().toString(); // Log.d(TAG, "button with id " +selectedAnswer);
+        creatorSelectedAnswer = ((Button)rootView.findViewById(checkedId)).getText().toString(); // Log.d(TAG, "button with id " +selectedAnswer);
     }
 
     private void createOwnerQuiz(View view) {
         EditText etQuestion = inpQuestion.getEditText(), etOptA = inpOptA.getEditText(), etOptB = inpOptB.getEditText(), etOptC = inpOptC.getEditText(), etOptD = inpOptD.getEditText(), etOptE = inpOptE.getEditText();
         QuizModel mQuizModel = new QuizModel();
-        if (selectedAnswer != null && etQuestion != null && etOptA != null && etOptB != null && etOptC != null && etOptD != null && etOptE != null){
-            if (!selectedAnswer.isEmpty() && !etQuestion.getText().toString().isEmpty() && !etOptA.getText().toString().isEmpty() && !etOptB.getText().toString().isEmpty() && !etOptC.getText().toString().isEmpty() && !etOptD.getText().toString().isEmpty() && !etOptE.getText().toString().isEmpty()){
+        if (creatorSelectedAnswer != null && etQuestion != null && etOptA != null && etOptB != null && etOptC != null && etOptD != null && etOptE != null){
+            if (!creatorSelectedAnswer.isEmpty() && !etQuestion.getText().toString().isEmpty() && !etOptA.getText().toString().isEmpty() && !etOptB.getText().toString().isEmpty() && !etOptC.getText().toString().isEmpty() && !etOptD.getText().toString().isEmpty() && !etOptE.getText().toString().isEmpty()){
                 mQuizModel.setQuizId(UUID.randomUUID().toString());
                 mQuizModel.setRoomId(currentRoomModel.getRoomId());
                 mQuizModel.setImageUrl("http://image_url.com/image1.png");
@@ -184,7 +194,7 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
                 mQuizModel.setOptC(etOptC.getText().toString().trim());
                 mQuizModel.setOptD(etOptD.getText().toString().trim());
                 mQuizModel.setOptE(etOptE.getText().toString().trim());
-                mQuizModel.setAnswer(selectedAnswer);
+                mQuizModel.setAnswer(creatorSelectedAnswer);
 
                 mPresenter.createOwnerQuiz(mQuizModel);
             }else
@@ -203,23 +213,66 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
         if (viewPage != viewPageSum){
             btnNext.setOnClickListener(view -> {
-                viewPage++;
-                setUpTakenQuiz(quizModelList);
+                try {
+                    viewPage++;
+                    recursiveCheckBoxes(0);
+                    setUpTakenQuiz(quizModelList);
+                } catch (Throwable t) {
+                    onError(t);
+                }
             });
         }else {
             btnNext.setText(R.string.finish);
-            btnNext.setOnClickListener(this::saveTakenQuiz);
+            btnNext.setOnClickListener(view -> saveTakenQuiz());
         }
     }
 
-    private void saveTakenQuiz(View view) {
-        if (currentParticipantModel != null){
-            mPresenter.finishTakenQuiz(currentParticipantModel); //clearSetup(view);
-        }else Log.d(TAG, "current participant is null");
+    private void recursiveCheckBoxes(int checked) { //6fcb5d7e-a85b-40c5-894c-874977982c54
+        MaterialCheckBox[] mCheckBoxes = new MaterialCheckBox[]{checkOptA, checkOptB, checkOptC, checkOptD, checkOptE};
+        String[] options = new String[]{"A", "B", "C", "D", "E"};
+
+        for (int i = 0; i < mCheckBoxes.length; i++) {
+            int index = i;
+            mCheckBoxes[i].setChecked(mCheckBoxes[i] == mCheckBoxes[checked]);
+
+            mCheckBoxes[i].setOnClickListener(view -> {
+                recursiveCheckBoxes(index);
+                if (currentQuizModelList.get(viewPage).getAnswer().equals(options[index]))
+                    correctAnswer.add(currentQuizModelList.get(viewPage).getQuestion()); // Log.d(TAG, options[index]+" is correct answer");
+                else wrongAnswer.add(currentQuizModelList.get(viewPage).getQuestion()); // Log.d(TAG, options[index]+" is wrong answer");
+
+            });
+        }
+    }
+
+    private void saveTakenQuiz() {
+        if (currentParticipantModel != null && currentUser != null && currentRoomModel != null){
+            ResultModel resultModel = new ResultModel();
+            resultModel.setResultId(UUID.randomUUID().toString());
+            resultModel.setRoomId(currentParticipantModel.getRoomId());
+            resultModel.setUserId(currentParticipantModel.getUserId());
+            resultModel.setUserName(currentUser.getFullName());
+            resultModel.setCorrectQuiz(correctAnswer.toString());
+            resultModel.setWrongQuiz(wrongAnswer.toString());
+            resultModel.setScore(correctAnswer.size()+" * 10 / "+currentQuizModelList.size()+ " = "+ correctAnswer.size() * 10 / currentQuizModelList.size());
+
+            mPresenter.expireParticipant(currentParticipantModel, resultModel); //clearSetup(view);
+
+        }else onError(new Throwable("Current data is not available."));
     }
 
     @Override
-    public void onRoomQuizListLoaded(List<QuizModel> quizModelList) {
+    public void onCurrentUserLoaded(UserModel userModel) { currentUser = userModel;
+        Log.d(TAG, "onCurrentUserLoaded");
+    }
+
+    @Override
+    public void onCurrentUserEmpty() {
+        Log.d(TAG, "onCurrentUserEmpty");
+    }
+
+    @Override
+    public void onRoomQuizListLoaded(List<QuizModel> quizModelList) { currentQuizModelList = quizModelList;
         Log.d(TAG, "onRoomQuizListLoaded");
         viewPageSum = quizModelList.size()-1;
 
@@ -239,19 +292,20 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     public void onOwnerQuizRemoteSaved(QuizModel quizModel) {
         Log.d(TAG, "onQuizRemoteSaved");
 
-        clearSetup(rootView, null);
+        clearSetup(rootView);
     }
 
     @Override
-    public void onFinishParticipantTakenQuiz(ParticipantModel participantModel) { // participant already updated.
+    public void onExpiredParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel) { // participant already updated.
         Log.d(TAG, "onFinishParticipantTakenQuiz");
 
-        clearSetup(rootView, new RoomOwnerFragment().toString());
+        ListObjects.navigateTo(mContext, new RoomOwnerFragment(), false).commit();
     }
 
     @Override
     public void onError(Throwable t) {
         Log.d(TAG, "onError "+ t.getLocalizedMessage());
+        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override

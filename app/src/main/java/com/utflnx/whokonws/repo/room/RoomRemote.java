@@ -30,7 +30,7 @@ public class RoomRemote implements RoomDataContract{
         container.put("userId", currentUserModel.getUserId());
 
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ListObjects.TABLE_ROOM}, container, null
+                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ListObjects.TABLE_ROOM}, container, null, null
         );
 
         remoteService.getOwnerRoom(APIRequestModel).enqueue(new Callback<List<RoomModel>>() {
@@ -51,7 +51,7 @@ public class RoomRemote implements RoomDataContract{
 
     @Override
     public void postOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_ROOM}, roomModel, null);
+        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_ROOM}, roomModel, null, null);
 
         remoteService.postOwnerRoom(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -75,7 +75,7 @@ public class RoomRemote implements RoomDataContract{
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_DELETE_COUPLE, new String[]{
                 ListObjects.TABLE_ROOM,
                 ListObjects.TABLE_QUIZ
-        }, container, null);
+        }, container, null, null);
 
         remoteService.deleteOwnerRoom(APIRequestModel).enqueue(new Callback<String>() {
             @Override
@@ -99,7 +99,7 @@ public class RoomRemote implements RoomDataContract{
         container.put("roomId", roomId);
 
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ListObjects.TABLE_ROOM}, container, null);
+                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ListObjects.TABLE_ROOM}, container, null, null);
 
         remoteService.getRoomById(APIRequestModel).enqueue(new Callback<List<RoomModel>>() {
             @Override
@@ -128,7 +128,7 @@ public class RoomRemote implements RoomDataContract{
         APIRequestModel apiRequestModel = RemoteModule.passingRequestModel(
                 ListObjects.ABOUT_POST_ONLY,
                 new String[]{ListObjects.TABLE_PARTICIPANT},
-                participantModel, null
+                participantModel, null, null
         );
 
         remoteService.postParticipant(apiRequestModel).enqueue(new Callback<String>() {

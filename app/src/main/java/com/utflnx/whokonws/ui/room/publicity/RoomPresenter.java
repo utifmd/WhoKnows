@@ -130,13 +130,13 @@ public class RoomPresenter implements RoomMainContract.Presenter {
         mParticipateRepository.getCurrentParticipate(roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
             @Override
             public void onParticipateExist(ParticipantModel participantModels) {
-                mView.onExistParticipation(participantModels);
+                mView.onParticipationExist(participantModels);
                 mView.onProgressHide();
             }
 
             @Override
             public void onParticipateExpired() {
-                mView.onExpiredParticipate();
+                mView.onParticipationExpired();
                 mView.onProgressHide();
             }
 

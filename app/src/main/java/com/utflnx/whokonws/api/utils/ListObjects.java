@@ -18,6 +18,7 @@ public class ListObjects {
     public static final String TABLE_QUIZ = "_table_quiz";
     public static final String TABLE_ROOM = "_table_room";
     public static final String TABLE_USER = "_table_user";
+    public static final String TABLE_RESULT = "_table_result";
     public static final String TABLE_CURRENT_USER = "_table_current_user";
     public static final String TABLE_CURRENT_ROOM = "_table_current_room";
     public static final String BASE_URL = "http://10.0.2.2:8888/www/"; // http://192.168.1.38:8888/www/"; //"http://localhost:8888/www/";
@@ -30,6 +31,7 @@ public class ListObjects {
     public static final String ABOUT_POST_ONLY = "post_only";
     public static final String ABOUT_DELETE = "delete";
     public static final String ABOUT_DELETE_COUPLE = "delete_couple";
+    public static final String ABOUT_UPDATE_POST_COUPLE = "update_post_couple";
     public static final String ABOUT_DELETE_TRIPLE = "delete_triple";
     public static final String ABOUT_UPDATE_ONLY = "update_only";
     public static final int KEY_CREATE_ROOM = 212121;

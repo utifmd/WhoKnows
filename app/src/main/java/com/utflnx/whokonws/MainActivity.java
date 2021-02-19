@@ -13,11 +13,11 @@ import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
 
 
 // TODO: 03/02/21
-/*
- * 2. RoomFragment TakeQuiz
- * 3.
- * 4.
- * 5. ...
+/* 1.
+ * 2.
+ * 3. Display room result
+ * 4. Display owner room indicators
+ * 5. Beautify UI
  *
  * */
 

@@ -25,8 +25,8 @@ public interface RoomMainContract {
         void onRoomLocalLoaded(RoomModel roomModel);
         void onRoomRemoteLoaded(RoomModel roomModel);
         void onRoomEmpty();
-        void onExistParticipation(ParticipantModel participantModels);
-        void onExpiredParticipate();
+        void onParticipationExist(ParticipantModel participantModels);
+        void onParticipationExpired();
         void onParticipantEmpty();
         void onQuestionsEmpty();
         void onRoomJoinSaved(RoomModel roomModel); // void onRoomItemSelected(Room room);

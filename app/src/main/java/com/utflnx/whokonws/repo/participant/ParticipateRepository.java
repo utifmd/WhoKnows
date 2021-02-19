@@ -3,6 +3,7 @@ package com.utflnx.whokonws.repo.participant;
 import android.content.Context;
 
 import com.utflnx.whokonws.model.ParticipantModel;
+import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
 
 public class ParticipateRepository implements ParticipantDataContract {
@@ -18,7 +19,7 @@ public class ParticipateRepository implements ParticipantDataContract {
     }
 
     @Override
-    public void updateCurrentParticipant(ParticipantModel participantModel, ActionParticipantCallback actionParticipantCallback) {
-        remoteParticipate.updateCurrentParticipant(participantModel, actionParticipantCallback);
+    public void updateCurrentParticipant(ParticipantModel participantModel, ResultModel resultModel, ActionParticipantCallback actionParticipantCallback) {
+        remoteParticipate.updateCurrentParticipant(participantModel, resultModel, actionParticipantCallback);
     }
 }

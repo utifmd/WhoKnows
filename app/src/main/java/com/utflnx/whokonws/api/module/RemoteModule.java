@@ -32,7 +32,7 @@ public abstract class RemoteModule {
         return provideRetrofit().create(RemoteService.class);
     }
 
-    public static APIRequestModel passingRequestModel(String aboutName, String[] tableName, Object container, String param){
+    public static APIRequestModel passingRequestModel(String aboutName, String[] tableName, Object container, Object container_next_1, String param){
         APIRequestModel APIRequestModel = new APIRequestModel();
         APIRequestModel.setAbout(aboutName);
         APIRequestModel.setDatabase(ListObjects.DATABASE_NAME);
@@ -41,6 +41,7 @@ public abstract class RemoteModule {
         table.put("name", tableName);
         if (param != null) table.put("param", param);
         if (container != null) table.put("container", container);
+        if (container_next_1 != null) table.put("container_next_1", container_next_1);
 
         APIRequestModel.setTable(table);
 

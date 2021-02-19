@@ -282,7 +282,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onExistParticipation(ParticipantModel participantModels) { currentParticipantModel = participantModels;
+    public void onParticipationExist(ParticipantModel participantModels) { currentParticipantModel = participantModels;
         Log.d(TAG, "onExistParticipation");
 
         Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
@@ -291,7 +291,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onExpiredParticipate() {
+    public void onParticipationExpired() {
         Log.d(TAG, "onExpiredParticipate");
 
         Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
