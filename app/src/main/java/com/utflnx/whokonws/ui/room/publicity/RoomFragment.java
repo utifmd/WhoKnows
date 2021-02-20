@@ -28,6 +28,7 @@ import com.utflnx.whokonws.repo.participant.ParticipateRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.repo.room.RoomRepository;
 import com.utflnx.whokonws.ui.quiz.QuizFragment;
+import com.utflnx.whokonws.ui.result.ResultFragment;
 import com.utflnx.whokonws.ui.room.publicity.extension.RoomAdapter;
 
 import java.util.Collections;
@@ -46,7 +47,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private View rootView, contentPublicRoom, contentJoin, contentList, btnCloseContent;
     private TextView roomTitle, roomDesc, roomTime;
     private TextInputLayout inpRoomId;
-    private Button btnJoinRoom, btnAddRoomQuiz, btnTakeRoom;
+    private Button btnJoinRoom, btnNewQuizResult, btnTakeRoom;
 
     private RoomModel currentRoomModel = null;
     private ParticipantModel currentParticipantModel = null;
@@ -107,7 +108,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         EditText etRoomId = inpRoomId.getEditText();
 
         if (etRoomId != null){
-            if (!etRoomId.getText().toString().isEmpty())
+            if (!etRoomId.getText().toString().trim().isEmpty())
                 mPresenter.joinRoom(etRoomId.getText().toString().trim());
             else
                 Snackbar.make(rootView, R.string.form_cant_empty, Snackbar.LENGTH_SHORT).show();
@@ -126,7 +127,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         btnCloseContent = rootView.findViewById(R.id.btn_close_content);
         btnJoinRoom = rootView.findViewById(R.id.btn_join_room);
-        btnAddRoomQuiz = rootView.findViewById(R.id.btn_add_room_quiz);
+        btnNewQuizResult = rootView.findViewById(R.id.btn_add_room_quiz);
         btnTakeRoom = rootView.findViewById(R.id.btn_take_room);
         inpRoomId = rootView.findViewById(R.id.text_input_room_id);
 
@@ -171,7 +172,13 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private void displayOwnerList(List<QuizModel> quizModelList){
         ListObjects.visibleGoneView(new View[]{contentList}, contentPublicRoom, contentJoin);
 
-        btnAddRoomQuiz.setOnClickListener(this::createQuiz);
+        if (currentRoomModel.isExpired()){
+            btnNewQuizResult.setText(R.string.result);
+            btnNewQuizResult.setOnClickListener(view -> this.resultQuiz(currentRoomModel));
+        }else {
+            btnNewQuizResult.setText(R.string.new_question);
+            btnNewQuizResult.setOnClickListener(this::createQuiz);
+        }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setHasFixedSize(true);
@@ -191,6 +198,11 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
     private void createQuiz(View view) {
         Fragment fragment = QuizFragment.createInstance(ListObjects.KEY_CREATE_ROOM, currentRoomModel, null);
+        ListObjects.navigateTo(mContext, fragment, true).commit();
+    }
+
+    private void resultQuiz(RoomModel roomModel) {
+        Fragment fragment = ResultFragment.createInstance(roomModel);
         ListObjects.navigateTo(mContext, fragment, true).commit();
     }
 
@@ -227,7 +239,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         mPresenter.saveCurrentRoom(roomModel);
         setHeaderRoom(roomModel);
 
-        mPresenter.displayCurrentParticipate(roomModel);
+        mPresenter.detectParticipation(roomModel);
     }
 
     @Override
@@ -235,7 +247,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         Log.d(TAG, "onRoomLocalLoaded()");
         mContext.runOnUiThread(() -> setHeaderRoom(roomModel));
 
-        mPresenter.displayCurrentParticipate(roomModel);
+        mPresenter.detectParticipation(roomModel);
     }
 
     @Override

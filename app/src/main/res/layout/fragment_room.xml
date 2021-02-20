@@ -13,7 +13,6 @@
 
     <LinearLayout android:id="@+id/contentList"
         android:orientation="vertical"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <com.google.android.material.button.MaterialButton
@@ -26,8 +25,6 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mRecyclerView"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </LinearLayout>

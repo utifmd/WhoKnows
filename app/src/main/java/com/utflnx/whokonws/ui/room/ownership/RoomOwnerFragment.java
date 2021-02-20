@@ -144,7 +144,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     private void initializeLayout(View rootView) {
         contentSubmit = rootView.findViewById(R.id.contentSubmit);
         contentList = rootView.findViewById(R.id.contentList);
-        recyclerView = rootView.findViewById(R.id.mainRecyclerView);
+        recyclerView = rootView.findViewById(R.id.mRecyclerView);
         btnCreateRoom = rootView.findViewById(R.id.btn_create_room);
         btnExpandFab = rootView.findViewById(R.id.fab_extend);
         btnDisplayPoster = rootView.findViewById(R.id.fab_post);
@@ -194,12 +194,14 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     @Override
     public boolean onRoomItemLongSelected(RoomModel roomModel, int position) {
         MaterialAlertDialogBuilder alertDialogBuilder = new MaterialAlertDialogBuilder(mContext);
-        alertDialogBuilder.setTitle("Are you sure to remove the "+ roomModel.getTitle()+"?").setNegativeButton("remove", (dialogInterface, i) -> {
-            mRoomModelArrayList.remove(roomModel);
-            mPresenter.removeRoom(roomModel);
-        }).show();
-
-        return true;
+        if(!roomModel.isExpired()) {
+            alertDialogBuilder.setTitle("Are you sure to remove the " + roomModel.getTitle().toLowerCase() + "?").setNegativeButton("remove", (dialogInterface, i) -> {
+                mRoomModelArrayList.remove(roomModel);
+                mPresenter.removeRoom(roomModel);
+            }).show();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -218,7 +220,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
 
     @Override
     public void onError(Throwable t) {
-
+        Log.d(TAG, "Sorry, "+t.getLocalizedMessage());
     }
 
     @Override

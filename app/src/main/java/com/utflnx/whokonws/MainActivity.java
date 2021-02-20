@@ -14,7 +14,7 @@ import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
 
 // TODO: 03/02/21
 /* 1.
- * 2.
+ * 2. Update room to expired ~> give number each questions
  * 3. Display room result
  * 4. Display owner room indicators
  * 5. Beautify UI

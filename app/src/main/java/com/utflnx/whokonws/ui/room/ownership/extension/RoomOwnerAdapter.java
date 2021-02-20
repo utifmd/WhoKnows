@@ -1,6 +1,7 @@
 package com.utflnx.whokonws.ui.room.ownership.extension;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,15 +54,22 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return roomModelList.size();
     }
 
-    private class GeneralViewHolder extends RecyclerView.ViewHolder{
-        TextView textTitle;
+    private static class GeneralViewHolder extends RecyclerView.ViewHolder{
+        TextView textTitle, textNumber;
         public GeneralViewHolder(@NonNull View itemView) {
             super(itemView);
+            textNumber = itemView.findViewById(R.id.item_number);
             textTitle = itemView.findViewById(R.id.item_title);
         }
 
         public void bind(RoomModel itemRoomModel, int position, RoomOwnerMainContract.Presenter mPresenter) {
+            textNumber.setText(itemRoomModel.getMinute()+" min.");
             textTitle.setText(itemRoomModel.getDesc());
+
+            if(itemRoomModel.isExpired())
+                textNumber.setTextColor(Color.parseColor("#5cb85c")); //success | danger ~> d9534f
+            else
+                textNumber.setTextColor(Color.parseColor("#f0ad4e")); //warning | info ~> 5bc0de
 
             itemView.setOnClickListener(view -> mPresenter.selectRoomItem(itemRoomModel));
             itemView.setOnLongClickListener(view -> mPresenter.selectLongRoomItem(itemRoomModel, position));

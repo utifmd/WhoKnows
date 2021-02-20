@@ -126,7 +126,7 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     }
 
     @Override
-    public void displayCurrentParticipate(RoomModel roomModel) {
+    public void detectParticipation(RoomModel roomModel) {
         mParticipateRepository.getCurrentParticipate(roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
             @Override
             public void onParticipateExist(ParticipantModel participantModels) {

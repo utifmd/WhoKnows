@@ -16,7 +16,7 @@
         tools:ignore="HardcodedText">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/mainRecyclerView"
+            android:id="@+id/mRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:text="@string/menu"
-            app:layout_anchor="@id/mainRecyclerView"
+            app:layout_anchor="@id/mRecyclerView"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:layout_anchorGravity="bottom|center"
             android:contentDescription="@string/appbar_scrolling_view_behavior"

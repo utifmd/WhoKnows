@@ -46,7 +46,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         QuizModel quizModel = mQuizModelList.get(position);
 
-        ((GeneralViewHolder)holder).bind(quizModel, mPresenter);
+        ((GeneralViewHolder)holder).bind(quizModel, position, mPresenter);
     }
 
     @Override
@@ -54,14 +54,16 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return mQuizModelList.size();
     }
 
-    private class GeneralViewHolder extends RecyclerView.ViewHolder{
-        TextView textViewTitle;
+    private static class GeneralViewHolder extends RecyclerView.ViewHolder{
+        TextView textViewTitle, textViewNumber;
         public GeneralViewHolder(@NonNull View itemView) {
             super(itemView);
+            textViewNumber = itemView.findViewById(R.id.item_number);
             textViewTitle = itemView.findViewById(R.id.item_title);
         }
 
-        public void bind(QuizModel quizModel, RoomMainContract.Presenter mPresenter) {
+        public void bind(QuizModel quizModel, int pos, RoomMainContract.Presenter mPresenter) {
+            textViewNumber.setText((pos+1)+".");
             textViewTitle.setText(quizModel.getQuestion());
 
             itemView.setOnClickListener(view -> mPresenter.selectItemQuiz(quizModel));

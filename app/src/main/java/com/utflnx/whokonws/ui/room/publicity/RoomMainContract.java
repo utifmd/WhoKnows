@@ -16,7 +16,7 @@ public interface RoomMainContract {
         void saveCurrentRoom(RoomModel roomModel);
         void removeCurrentRoom(RoomModel roomModel);
         void displayCurrentRoom();
-        void displayCurrentParticipate(RoomModel roomModel);
+        void detectParticipation(RoomModel roomModel);
         void displayRoomQuizList(RoomModel roomModel);
         void selectItemQuiz(QuizModel quizModel);
     }

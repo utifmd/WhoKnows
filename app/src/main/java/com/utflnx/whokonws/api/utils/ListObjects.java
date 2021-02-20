@@ -33,6 +33,7 @@ public class ListObjects {
     public static final String ABOUT_DELETE_COUPLE = "delete_couple";
     public static final String ABOUT_UPDATE_POST_COUPLE = "update_post_couple";
     public static final String ABOUT_DELETE_TRIPLE = "delete_triple";
+    public static final String ABOUT_DELETE_QUAD = "delete_quad";
     public static final String ABOUT_UPDATE_ONLY = "update_only";
     public static final int KEY_CREATE_ROOM = 212121;
     public static final int KEY_TAKE_ROOM = 313131;

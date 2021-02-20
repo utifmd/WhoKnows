@@ -3,6 +3,7 @@ package com.utflnx.whokonws.api.service;
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.QuizModel;
 import com.utflnx.whokonws.model.APIRequestModel;
+import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.api.utils.ListObjects;
@@ -54,8 +55,9 @@ public interface RemoteService {
     @POST(ListObjects.PARAM_WHO_KNOWS_URL)
     Call<List<ParticipantModel>> getParticipantBy(@Body APIRequestModel APIRequestModel);
 
-
     @POST(ListObjects.PARAM_WHO_KNOWS_URL)
     Call<String> updateParticipant(@Body APIRequestModel APIRequestModel);
 
+    @POST(ListObjects.PARAM_WHO_KNOWS_URL)
+    Call<List<ResultModel>> getResultBy(@Body APIRequestModel APIRequestModel);
 }

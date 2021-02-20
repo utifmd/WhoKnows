@@ -7,38 +7,41 @@
     android:gravity="center">
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_room_title"
-        android:inputType="textNoSuggestions"
+        app:startIconDrawable="@drawable/ic_baseline_topic_24"
         android:hint="@string/topic"
+        app:endIconMode="clear_text"
         android:layout_marginVertical="8dp"
         android:layout_marginHorizontal="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_room_desc"
+        app:startIconDrawable="@drawable/ic_baseline_description_24"
         android:hint="@string/description"
-        android:inputType="textNoSuggestions"
+        app:endIconMode="clear_text"
         android:layout_marginVertical="8dp"
         android:layout_marginHorizontal="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_room_time"
+        app:startIconDrawable="@drawable/ic_baseline_access_time_filled_24"
+        app:endIconMode="clear_text"
         android:hint="@string/remaining_time"
-        android:inputType="textNoSuggestions"
         android:layout_marginVertical="8dp"
         android:layout_marginHorizontal="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions|number" android:layout_width="match_parent" android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <LinearLayout

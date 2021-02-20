@@ -21,22 +21,26 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_email_sign_in"
-            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:startIconDrawable="@drawable/ic_baseline_person_24"
+            app:startIconContentDescription="@string/content_description_end_icon"
+            app:endIconMode="clear_text"
             android:hint="@string/email_address"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <Space android:layout_width="match_parent" android:layout_height="16dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_password"
-            android:inputType="textNoSuggestions"
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
+            app:startIconContentDescription="@string/content_description_end_icon"
+            app:endIconMode="password_toggle"
             android:hint="@string/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textPassword" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
@@ -48,46 +52,52 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_full_name"
-            android:inputType="textNoSuggestions"
+            app:startIconDrawable="@drawable/ic_baseline_person_24"
+            app:endIconMode="clear_text"
             android:hint="@string/full_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <Space android:layout_width="match_parent" android:layout_height="16dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_email_register"
-            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:startIconDrawable="@drawable/ic_baseline_email_24"
+            app:endIconMode="clear_text"
             android:hint="@string/email_address"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textEmailAddress|textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <Space android:layout_width="match_parent" android:layout_height="16dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/et_phone"
-            android:inputType="textNoSuggestions"
+            app:startIconDrawable="@drawable/ic_baseline_call_24"
+            app:endIconMode="clear_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/phone_number"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="number|textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <Space android:layout_width="match_parent" android:layout_height="16dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/new_password"
-            android:inputType="textNoSuggestions"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
             android:hint="@string/enter_new_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions|textPassword" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <Space android:layout_width="match_parent" android:layout_height="16dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/confirm_password"
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
+            app:endIconMode="clear_text"
             android:inputType="textNoSuggestions"
             android:hint="@string/confirm_new_password"
             android:layout_width="match_parent"

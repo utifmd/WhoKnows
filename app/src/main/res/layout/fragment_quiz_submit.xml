@@ -11,70 +11,70 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_question"
+            app:startIconDrawable="@drawable/ic_baseline_psychology_24"
             android:hint="@string/enter_question"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:lines="3" android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:lines="3" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_opt_a"
+            app:startIconDrawable="@drawable/ic_baseline_assistant_24"
             android:hint="@string/enter_option_a"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_opt_b"
+            app:startIconDrawable="@drawable/ic_baseline_assistant_24"
             android:hint="@string/enter_option_b"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_opt_c"
+            app:startIconDrawable="@drawable/ic_baseline_assistant_24"
             android:hint="@string/enter_option_c"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_opt_d"
+            app:startIconDrawable="@drawable/ic_baseline_assistant_24"
             android:hint="@string/enter_option_d"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_opt_e"
+            app:startIconDrawable="@drawable/ic_baseline_assistant_24"
             android:hint="@string/enter_option_e"
-            android:inputType="textNoSuggestions"
             android:layout_marginVertical="8dp"
             android:layout_marginHorizontal="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-            <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+            <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -90,15 +90,15 @@
             app:singleSelection="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <Button android:id="@+id/btn_opt_a" android:layout_width="70dp" android:layout_height="wrap_content"
+            <Button android:id="@+id/btn_opt_a" android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/a" style="?attr/materialButtonOutlinedStyle" />
-            <Button android:id="@+id/btn_opt_b" android:layout_width="70dp" android:layout_height="wrap_content"
+            <Button android:id="@+id/btn_opt_b" android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/b" style="?attr/materialButtonOutlinedStyle" />
-            <Button android:id="@+id/btn_opt_c" android:layout_width="70dp" android:layout_height="wrap_content"
+            <Button android:id="@+id/btn_opt_c" android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/c" style="?attr/materialButtonOutlinedStyle" />
-            <Button android:id="@+id/btn_opt_d" android:layout_width="70dp" android:layout_height="wrap_content"
+            <Button android:id="@+id/btn_opt_d" android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/d" style="?attr/materialButtonOutlinedStyle" />
-            <Button android:id="@+id/btn_opt_e" android:layout_width="70dp" android:layout_height="wrap_content"
+            <Button android:id="@+id/btn_opt_e" android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="@string/e" style="?attr/materialButtonOutlinedStyle" />
         </com.google.android.material.button.MaterialButtonToggleGroup>
 

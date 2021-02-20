@@ -8,14 +8,15 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_room_id"
+        app:startIconDrawable="@drawable/ic_baseline_keyboard_24"
         android:hint="@string/room_id"
-        android:inputType="textNoSuggestions"
+        app:endIconMode="clear_text"
         android:layout_marginVertical="8dp"
         android:layout_marginHorizontal="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
-        <com.google.android.material.textfield.TextInputEditText android:layout_width="match_parent" android:layout_height="wrap_content" />
+        <com.google.android.material.textfield.TextInputEditText android:inputType="textNoSuggestions" android:layout_width="match_parent" android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton

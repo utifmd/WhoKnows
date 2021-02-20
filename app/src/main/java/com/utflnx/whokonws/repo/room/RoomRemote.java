@@ -29,9 +29,7 @@ public class RoomRemote implements RoomDataContract{
         HashMap<String, String> container = new HashMap<>();
         container.put("userId", currentUserModel.getUserId());
 
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ListObjects.TABLE_ROOM}, container, null, null
-        );
+        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_FETCH_SINGLE, new String[]{ ListObjects.TABLE_ROOM }, container, null, null);
 
         remoteService.getOwnerRoom(APIRequestModel).enqueue(new Callback<List<RoomModel>>() {
             @Override
@@ -72,9 +70,12 @@ public class RoomRemote implements RoomDataContract{
     public void deleteOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) {
         HashMap<String, String> container = new HashMap<>();
         container.put("roomId", roomModel.getRoomId());
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_DELETE_COUPLE, new String[]{
+
+        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_DELETE_QUAD, new String[]{
                 ListObjects.TABLE_ROOM,
-                ListObjects.TABLE_QUIZ
+                ListObjects.TABLE_QUIZ,
+                ListObjects.TABLE_RESULT,
+                ListObjects.TABLE_PARTICIPANT
         }, container, null, null);
 
         remoteService.deleteOwnerRoom(APIRequestModel).enqueue(new Callback<String>() {

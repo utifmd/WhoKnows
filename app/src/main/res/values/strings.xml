@@ -47,4 +47,6 @@
     <string name="participate">Participate</string>
     <string name="new_question">new question</string>
     <string name="_continue">continue</string>
+    <string name="result">Result</string>
+    <string name="content_description_end_icon">content_description</string>
 </resources>
