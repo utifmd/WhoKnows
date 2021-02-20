@@ -44,6 +44,7 @@ class WhoKnows{
         $alert_content = implode(", ", array_slice($this->container, 0, 2)).',..';
         $_table_next_1 = $this->tables[1];
         $_table_next_2 = $this->tables[2];
+        $_table_next_3 = $this->tables[3];
         
         if($operation == "fetch_sign_in"){
             if(stripos($str_col, '@') !== FALSE){
@@ -129,7 +130,11 @@ class WhoKnows{
 
             echo $this->onComplete(true, "$str_row delete successfully");
         }else if($operation == "delete_triple"){
-            $this->onDatabase("DELETE FROM $this->table WHERE $str_col = $str_row; DELETE FROM $_table_next_1 WHERE $str_col = $str_row; DELETE FROM $_table_next_2 WHERE $str_col = $str_row;", true);
+            $this->onDatabase("DELETE FROM $this->table WHERE `$str_col` = '$str_row'; DELETE FROM $_table_next_1 WHERE `$str_col` = '$str_row'; DELETE FROM $_table_next_2 WHERE `$str_col` = '$str_row';", true);
+
+            echo $this->onComplete(true, "$str_row delete successfully");
+        }else if($operation == "delete_quad"){
+            $this->onDatabase("DELETE FROM $this->table WHERE `$str_col` = '$str_row'; DELETE FROM $_table_next_1 WHERE `$str_col` = '$str_row'; DELETE FROM $_table_next_2 WHERE `$str_col` = '$str_row';DELETE FROM $_table_next_3 WHERE `$str_col` = '$str_row';", true);
 
             echo $this->onComplete(true, "$str_row delete successfully");
         }else{
