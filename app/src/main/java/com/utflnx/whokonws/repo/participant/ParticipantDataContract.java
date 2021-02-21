@@ -3,11 +3,12 @@ package com.utflnx.whokonws.repo.participant;
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.UserModel;
 
 import java.util.List;
 
 public interface ParticipantDataContract {
-    void getCurrentParticipate(RoomModel roomModel, LoadedParticipantCallback participantCallback);
+    void getCurrentParticipate(UserModel currentUser, RoomModel roomModel, LoadedParticipantCallback participantCallback);
     void updateCurrentParticipant(ParticipantModel participantModel, ResultModel resultModel, ActionParticipantCallback actionParticipantCallback);
 
     interface LoadedParticipantCallback{

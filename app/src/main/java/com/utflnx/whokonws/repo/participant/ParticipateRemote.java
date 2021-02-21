@@ -10,6 +10,7 @@ import com.utflnx.whokonws.model.APIRequestModel;
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.UserModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +28,25 @@ public class ParticipateRemote implements ParticipantDataContract {
     }
 
     @Override
-    public void getCurrentParticipate(RoomModel roomModel, LoadedParticipantCallback participantCallback) {
+    public void getCurrentParticipate(UserModel currentUser, RoomModel roomModel, LoadedParticipantCallback participantCallback) {
         HashMap<String, String> container = new HashMap<>();
-        container.put("userId", roomModel.getUserId());
-
+        container.put("userId", currentUser.getUserId());
+        container.put("roomId", roomModel.getRoomId());
+/*
+* $fetchCoupleBy = '{
+    "about": "fetch_couple_by",
+    "database": "_who_knows",
+    "table": {
+        "name": ["_table_room"],
+        "container": {
+            "roomId": "83c8c2c9-204c-45e6-bb16-e6221127c7ff",
+            "userId": "58eb70f4-0e83-4bf0-aac5-c40f9bad3565"
+        }
+    }
+}';
+* */
         APIRequestModel requestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_SINGLE, new String[]{ ListObjects.TABLE_PARTICIPANT }, container, null, null);
+                ListObjects.ABOUT_FETCH_COUPLE_BY, new String[]{ ListObjects.TABLE_PARTICIPANT }, container, null, null);
 
         remoteService.getParticipantBy(requestModel).enqueue(new Callback<List<ParticipantModel>>() {
             @Override
@@ -42,11 +56,12 @@ public class ParticipateRemote implements ParticipantDataContract {
                         participantCallback.onEmptyParticipant();
                     }else {
                         for (ParticipantModel model: response.body()){
-                            if (model.getRoomId().equals(roomModel.getRoomId()) && !model.isExpired())
+                            if (!model.isExpired())
                                 participantCallback.onParticipateExist(model);
-
-                            else if (model.getRoomId().equals(roomModel.getRoomId()) && model.isExpired())
+                            else if (model.isExpired())
                                 participantCallback.onParticipateExpired();
+                            else
+                                participantCallback.onError(new Throwable("Invalid server response."));
 
                             break;
                         }

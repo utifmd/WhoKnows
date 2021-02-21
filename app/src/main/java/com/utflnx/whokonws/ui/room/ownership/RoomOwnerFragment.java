@@ -22,9 +22,11 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.repo.room.RoomRepository;
+import com.utflnx.whokonws.ui.profile.ProfileFragment;
 import com.utflnx.whokonws.ui.room.ownership.extension.RoomOwnerAdapter;
 import com.utflnx.whokonws.ui.room.publicity.RoomFragment;
 
@@ -40,9 +42,11 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     private ProfileRepository profileRepository;
     private QuizRepository quizRepository;
 
-    private View rootView, contentSubmit, contentList, btnClosePost, btnCreateRoom;
+    private View rootView, contentSubmit, contentList, contentEmpty, btnClosePost, btnCreateRoom;
     private RecyclerView recyclerView;
     private TextInputLayout inpTitle, inpDesc, inpMinute;
+
+    private UserModel currentUser;
 
     private ExtendedFloatingActionButton btnExpandFab;
     private FloatingActionButton btnDisplayPoster, btnDisplayFinder;
@@ -67,9 +71,24 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
         adapter = new RoomOwnerAdapter(context);
     }
 
+    public static RoomOwnerFragment createInstance(UserModel currentUser){
+        RoomOwnerFragment fragment = new RoomOwnerFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null) {
+            currentUser = (UserModel) getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
+        }
+
+        Log.d(TAG, "onCreate user: "+currentUser.getEmail());
 
         new RoomOwnerPresenter(this, roomRepository, profileRepository, quizRepository);
     }
@@ -84,6 +103,9 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
         rootView = inflater.inflate(R.layout.fragment_room_owner, container, false);
 
         initializeLayout(rootView);
+
+        if (currentUser != null) mPresenter.displayOwnerRoom(currentUser);
+
         showHideFabMenu(rootView);
 
         return rootView;
@@ -94,7 +116,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     }
 
     private void displayListRoom(View btnView) {
-        ListObjects.visibleGoneView(new View[]{contentList}, contentSubmit);
+        ListObjects.visibleGoneView(new View[]{contentList, recyclerView}, contentEmpty, contentSubmit);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setHasFixedSize(true);
@@ -104,7 +126,12 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     }
 
     private void displayJoinRoom(View btnView) {
-        ListObjects.navigateTo(mContext, new RoomFragment(), true).commit(); // ListObjects.visibleGoneView(new View[]{contentFind}, contentList, contentSubmit);
+        RoomFragment fragment = RoomFragment.createInstance(currentUser, null, true);
+        ListObjects.navigateTo(mContext, fragment, true).commit(); // ListObjects.visibleGoneView(new View[]{contentFind}, contentList, contentSubmit);
+    }
+
+    private void displayEmpty(View btnView) {
+        ListObjects.visibleGoneView(new View[]{contentEmpty}, recyclerView);
     }
 
     private void createRoom(View btnView) {
@@ -115,6 +142,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
             if (!etTitle.getText().toString().isEmpty() && !etDesc.getText().toString().isEmpty() && !etMinute.getText().toString().isEmpty()){
 
                 roomModel.setRoomId(UUID.randomUUID().toString());
+                roomModel.setUserId(currentUser.getUserId());
                 roomModel.setTitle(etTitle.getText().toString().trim());
                 roomModel.setDesc(etDesc.getText().toString().trim());
                 roomModel.setMinute(etMinute.getText().toString().trim());
@@ -145,6 +173,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
         contentSubmit = rootView.findViewById(R.id.contentSubmit);
         contentList = rootView.findViewById(R.id.contentList);
         recyclerView = rootView.findViewById(R.id.mRecyclerView);
+        contentEmpty = rootView.findViewById(R.id.contentEmpty);
         btnCreateRoom = rootView.findViewById(R.id.btn_create_room);
         btnExpandFab = rootView.findViewById(R.id.fab_extend);
         btnDisplayPoster = rootView.findViewById(R.id.fab_post);
@@ -173,6 +202,8 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     @Override
     public void onRoomOwnerEmpty() {
         Log.d(TAG, "onRoomEmpty()");
+
+        displayEmpty(rootView);
     }
 
     @Override
@@ -187,7 +218,7 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     public void onRoomItemSelected(RoomModel roomModel) {
         Log.d(TAG, "onRoomItemSelected: "+ roomModel.getTitle());
 
-        Fragment roomFragment = RoomFragment.createInstance(roomModel, true);
+        Fragment roomFragment = RoomFragment.createInstance(currentUser, roomModel, true);
         ListObjects.navigateTo(mContext, roomFragment, true).commit();
     }
 
@@ -210,6 +241,9 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
 
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+
+        if (mRoomModelArrayList.isEmpty()) displayEmpty(rootView);
+
         Snackbar.make(rootView, roomModel.getTitle()+" successfully removed.", Snackbar.LENGTH_SHORT).show();
     }
 

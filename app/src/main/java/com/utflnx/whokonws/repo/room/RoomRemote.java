@@ -147,4 +147,24 @@ public class RoomRemote implements RoomDataContract{
             }
         });
     }
+
+    @Override
+    public void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack) {
+        APIRequestModel requestModel = RemoteModule.passingRequestModel(
+                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_ROOM}, currentRoom, null, "roomId = '"+currentRoom.getRoomId()+"'");
+
+        remoteService.updateOwnerRoom(requestModel).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.body() != null){
+                    roomCallBack.onRoomResponse(currentRoom);
+                } else roomCallBack.onError(new Throwable("Invalid server response."));
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                roomCallBack.onError(t);
+            }
+        });
+    }
 }

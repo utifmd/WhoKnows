@@ -48,4 +48,9 @@ public class RoomRepository implements RoomDataContract {
     public void postPublicParticipant(ParticipantModel participantModel, ActionParticipantCallBack participantCallBack) {
         roomRemote.postPublicParticipant(participantModel, participantCallBack);
     }
+
+    @Override
+    public void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack) {
+        roomRemote.updateCurrentRoom(currentRoom, roomCallBack);
+    }
 }

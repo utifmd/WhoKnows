@@ -38,6 +38,9 @@ public interface RemoteService {
     Call<String> postOwnerRoom(@Body APIRequestModel APIRequestModel);
 
     @POST(ListObjects.PARAM_WHO_KNOWS_URL)
+    Call<String> updateOwnerRoom(@Body APIRequestModel APIRequestModel);
+
+    @POST(ListObjects.PARAM_WHO_KNOWS_URL)
     Call<String> deleteOwnerRoom(@Body APIRequestModel APIRequestModel);
 
     @POST(ListObjects.PARAM_WHO_KNOWS_URL)

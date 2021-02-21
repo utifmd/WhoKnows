@@ -6,8 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <include android:id="@+id/contentSubmit"
-        android:visibility="gone"
-        layout="@layout/fragment_room_submit"/>
+        android:visibility="gone" layout="@layout/fragment_room_submit"/>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/contentList"
@@ -19,6 +18,9 @@
             android:id="@+id/mRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
+
+        <include android:id="@+id/contentEmpty"
+            android:visibility="gone" layout="@layout/item_empty"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_post"

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.utflnx.whokonws.R;
+import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.repo.result.ResultRepository;
@@ -27,7 +28,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     private ResultMainContract.Presenter mPresenter;
     private ResultRepository mResultRepository;
     private final static String KEY_RESULT_FRAGMENT = "KeyResultFragment";
-    private View rootView;
+    private View rootView, contentEmpty;
     private Context mContext;
 
     private RoomModel currentRoomModel = null;
@@ -71,6 +72,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     }
 
     private void initializeLayout() {
+        contentEmpty = rootView.findViewById(R.id.contentEmpty);
         mAdapter = new ResultAdapter(mContext);
         mRecyclerView = rootView.findViewById(R.id.mRecyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
@@ -80,6 +82,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onResultDisplay(List<ResultModel> resultModels) {
         Log.d(TAG, "onResultDisplay");
+        ListObjects.visibleGoneView(new View[]{mRecyclerView}, contentEmpty);
 
         mAdapter.setData(resultModels);
         mRecyclerView.setAdapter(mAdapter);
@@ -98,6 +101,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onResultEmpty() {
         Log.d(TAG, "onResultEmpty");
+        ListObjects.visibleGoneView(new View[]{contentEmpty}, mRecyclerView);
     }
 
     @Override

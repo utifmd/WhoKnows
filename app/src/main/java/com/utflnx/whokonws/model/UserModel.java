@@ -7,14 +7,17 @@ import androidx.room.PrimaryKey;
 
 import com.utflnx.whokonws.api.utils.ListObjects;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 import java.util.Arrays;
 
 @Entity(tableName = ListObjects.TABLE_CURRENT_USER)
-public class UserModel {
+public class UserModel implements Serializable {
 
     @PrimaryKey()
     @NonNull()
-    private String userId;
+    private String userId = "";
 
     @ColumnInfo(name = "fullName")
     private String fullName;
@@ -30,6 +33,11 @@ public class UserModel {
 
     @ColumnInfo(name = "password")
     private String password;
+
+    public UserModel(){}
+    public UserModel(@NotNull String userId){
+        this.userId = userId;
+    }
 
     public String getUserId() {
         return userId;

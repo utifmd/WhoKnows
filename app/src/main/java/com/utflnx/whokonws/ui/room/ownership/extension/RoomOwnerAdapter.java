@@ -37,9 +37,8 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @NonNull @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room_general, parent, false);
-
-        return new GeneralViewHolder(itemView);
+        return new GeneralViewHolder(
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room_general, parent, false));
     }
 
     @Override
@@ -67,9 +66,9 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             textTitle.setText(itemRoomModel.getDesc());
 
             if(itemRoomModel.isExpired())
-                textNumber.setTextColor(Color.parseColor("#5cb85c")); //success | danger ~> d9534f
+                textNumber.setTextColor(Color.parseColor("#5cb85c")); //success | danger ~> #d9534f
             else
-                textNumber.setTextColor(Color.parseColor("#f0ad4e")); //warning | info ~> 5bc0de
+                textNumber.setTextColor(Color.parseColor("#f0ad4e")); //warning | info ~> #5bc0de
 
             itemView.setOnClickListener(view -> mPresenter.selectRoomItem(itemRoomModel));
             itemView.setOnLongClickListener(view -> mPresenter.selectLongRoomItem(itemRoomModel, position));

@@ -17,8 +17,6 @@ public class RoomOwnerPresenter implements RoomOwnerMainContract.Presenter {
     private final ProfileRepository mProfileRepository;
     private final QuizRepository mQuizRepository;
 
-    private String currentUserId;
-
     public RoomOwnerPresenter(RoomOwnerMainContract.View mView, RoomRepository repository, ProfileRepository profileRepository, QuizRepository quizRepository) {
         this.mView = mView;
         this.mRepository = repository;
@@ -55,24 +53,19 @@ public class RoomOwnerPresenter implements RoomOwnerMainContract.Presenter {
     @Override
     public void createRoom(RoomModel roomModel) {
         mView.onProgressShow();
-        if (currentUserId != null && !currentUserId.isEmpty()){
-            roomModel.setUserId(currentUserId);
+        mRepository.postOwnerRoom(roomModel, new RoomDataContract.ActionRoomCallBack() {
+            @Override
+            public void onRoomResponse(RoomModel roomModel) {
+                mView.onRoomOwnerSaved(roomModel);
+                mView.onProgressHide();
+            }
 
-            mRepository.postOwnerRoom(roomModel, new RoomDataContract.ActionRoomCallBack() {
-                @Override
-                public void onRoomResponse(RoomModel roomModel) {
-                    mView.onRoomOwnerSaved(roomModel);
-                    mView.onProgressHide();
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    mView.onError(t);
-                    mView.onProgressHide();
-                }
-            });
-        } else
-            mView.onError(new Throwable("Current user id invalid."));
+            @Override
+            public void onError(Throwable t) {
+                mView.onError(t);
+                mView.onProgressHide();
+            }
+        });
     }
 
     private void getRemoteRoomBy(String roomId) {
@@ -127,33 +120,7 @@ public class RoomOwnerPresenter implements RoomOwnerMainContract.Presenter {
 
     @Override
     public void start() {
-        loadCurrentUser();
-    }
 
-    private void loadCurrentUser() {
-
-        mView.onProgressShow();
-        mProfileRepository.getLocalProfile(new ProfileDataContract.LoadedProfileCallBack() {
-            @Override
-            public void onProfileLoaded(UserModel currentUserModel) {
-                displayOwnerRoom(currentUserModel);
-                mView.onProgressHide();
-
-                currentUserId = currentUserModel.getUserId();
-            }
-
-            @Override
-            public void onProfileEmpty() {
-                mView.onRoomOwnerEmpty();
-                mView.onProgressHide();
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                mView.onError(t);
-                mView.onProgressHide();
-            }
-        });
     }
 
     @Override

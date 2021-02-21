@@ -45,6 +45,11 @@ class WhoKnows{
         $_table_next_1 = $this->tables[1];
         $_table_next_2 = $this->tables[2];
         $_table_next_3 = $this->tables[3];
+
+        $str_col_1_container = array_keys($this->container)[0];
+        $str_col_2_container = array_keys($this->container)[1];
+        $str_row_1_container = array_values($this->container)[0];
+        $str_row_2_container = array_values($this->container)[1];
         
         if($operation == "fetch_sign_in"){
             if(stripos($str_col, '@') !== FALSE){
@@ -67,6 +72,14 @@ class WhoKnows{
             echo $this->onComplete(true, $rows);
         }else if($operation == "fetch_single"){
             $this->onDatabase("SELECT * FROM $this->table WHERE `$str_col` = '$str_row'", false);
+            
+            while($row = $this->query->fetch_assoc()){
+                $rows[] = $row;
+            }
+            
+            echo $this->onComplete(true, $rows);
+        }else if($operation == "fetch_couple_by"){
+            $this->onDatabase("SELECT * FROM $this->table WHERE (`$str_col_1_container` = '$str_row_1_container' AND `$str_col_2_container` = '$str_row_2_container')", false);
             
             while($row = $this->query->fetch_assoc()){
                 $rows[] = $row;
@@ -181,93 +194,9 @@ class WhoKnows{
         return json_encode($data, JSON_PRETTY_PRINT);
     }
 }
-// $fetchSingle = '{
-//     "about": "fetch_single",
-//     "database": "_who_knows",
-//     "table": {
-//         "name": ["_table_users"],
-//         "container": {
-//             "utifmd": "9809poiiop"
-//         }
-//     }
-// }';
-
-$objDelete = '{
-    "about": "delete_couple",
-    "database": "_who_knows",
-    "table": {
-        "name": ["_table_room", "_table_quiz"],
-        "container": {
-            "roomId": "221"
-        }
-    }
-}';
-
-$objFetchJoin = '{
-    "about": "fetch_join",
-    "database": "_who_knows",
-    "table": {
-        "param": "userId",
-        "name": ["_table_user", "_table_room"]
-    }
-}';
-    
-$objFetchJoinBy = '{
-    "about": "fetch_join_by",
-    "database": "_who_knows",
-    "table": {
-        "name": ["_table_quiz", "_table_room"],
-        "container":{
-            "roomId":"ec47497a-c772-4cae-a487-36299e210977"
-        }
-    }
-}';
-
-$objFetchSingle = '{
-    "about":"fetch_single",
-    "database":"_who_knows",
-    "table":{
-        "name":["_table_quiz"],
-        "container":{
-            "roomId":"2a0c64a6-44b1-4e0d-b697-97a9935550fc"
-        }
-    }
-}';
-
-$objUpdatePostCouple = '{
-    "about": "update_post_couple",
-    "database": "_who_knows",
-    "table": {
-        "param": "participantId = 19ccb021-36f6-458c-a1fd-e47c052c3d13",
-        "name": ["_table_participant", "_table_result"], 
-        "container": {
-            "participantId": "N/A",
-            "roomId": "N/A",
-            "userId": "N/A",
-            "totalQuiz": 0,
-            "totalTime": 0,
-            "currentPage": "N/A",
-            "timeRemaining": "N/A",
-            "expired": 1
-        },
-        "container_next_1": {
-            "resultId": "N/A",
-            "roomId": "N/A",
-            "userId": "N/A",
-            "userName": "N/A",
-            "correctQuiz": "N/A",
-            "wrongQuiz": "N/A",
-            "score": "N/A"
-        }
-    }
-}';
 
 $case = file_get_contents('php://input');
-    // $objUpdatePostCouple;
-        // $objFetchJoinBy;
-    //   $objDelete;
-    //  $objCoupleInsert;
-    // $objFetchJoin;
+    //$fetchCoupleBy;
 
 $requests = json_decode($case);
 $whoKnows = new WhoKnows("root", $requests->database, $case);

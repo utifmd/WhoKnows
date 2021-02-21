@@ -71,16 +71,19 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     @Override
     public void onProfileLoaded(UserModel currentUserModel) {
         Log.d(TAG, "onProfileLoaded()");
-        ListObjects.navigateTo(getContext(), new ProfileFragment(), false).commit();
+        ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel);
+
+        ListObjects.navigateTo(getContext(), fragment, false).commit();
     }
 
     @Override
     public void onSignedIn(UserModel currentUserModel) {
         Log.d(TAG, "onSignedIn()");
+        ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel);
         mPresenter.saveCurrentUser(currentUserModel);
         Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show();
 
-        ListObjects.navigateTo(getContext(), new ProfileFragment(), false).commit();
+        ListObjects.navigateTo(getContext(), fragment, false).commit();
     }
 
     @Override
@@ -195,23 +198,23 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
 
     private void displayGeneral(View view) {
         updateStateLayout(VIEW_TYPE_GENERAL);
+        ListObjects.visibleGoneView(new View[]{btnExplore, btnFooter}, btnCloseContent, contentRegister, contentSignIn);
 
         btnSubmit.setText(R.string.sign_in);
-        ListObjects.visibleGoneView(new View[]{btnExplore, btnFooter}, btnCloseContent, contentRegister, contentSignIn);
     }
 
     private void displaySignInForm(View view) {
         updateStateLayout(VIEW_TYPE_SIGN_IN);
+        ListObjects.visibleGoneView(new View[]{contentSignIn, btnCloseContent}, contentRegister, btnExplore, btnFooter);
 
         btnSubmit.setText(R.string.sign_in);
-        ListObjects.visibleGoneView(new View[]{contentSignIn, btnCloseContent}, contentRegister, btnExplore, btnFooter);
     }
 
     private void displayRegisterForm(View view) {
         updateStateLayout(VIEW_TYPE_REGISTER);
+        ListObjects.visibleGoneView(new View[]{contentRegister, btnCloseContent}, contentSignIn, btnExplore, btnFooter);
 
         btnSubmit.setText(R.string.register);
-        ListObjects.visibleGoneView(new View[]{contentRegister, btnCloseContent}, contentSignIn, btnExplore, btnFooter);
     }
 
     private void initializeLayout(View rootView) {

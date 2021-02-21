@@ -14,6 +14,7 @@ public interface RoomDataContract {
     void getLocalRoom(LoadedRoomCallback callBack);
     void postLocalRoom(RoomModel roomModel);
     void postPublicParticipant(ParticipantModel participantModel, ActionParticipantCallBack participantCallBack);
+    void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack);
 
 //    void postQuestion(Quiz quiz);
 //    void deleteQuestion(Quiz quiz);

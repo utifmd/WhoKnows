@@ -16,7 +16,7 @@
     <string name="create_room">Create room</string>
     <string name="title">Title</string>
     <string name="description">Description</string>
-    <string name="remaining_time">Remaining time</string>
+    <string name="remaining_time">Time in minute</string>
     <string name="form_cant_empty">Sorry forms can\'t be empty!</string>
     <string name="invalid_input">Invalid input system error.</string>
     <string name="topic">Topic</string>
@@ -49,4 +49,9 @@
     <string name="_continue">continue</string>
     <string name="result">Result</string>
     <string name="content_description_end_icon">content_description</string>
+    <string name="empty">Empty</string>
+    <string name="options">Options</string>
+    <string name="_30_min">30 min</string>
+    <string name="publish">Publish</string>
+    <string name="room_id_copy">room id</string>
 </resources>

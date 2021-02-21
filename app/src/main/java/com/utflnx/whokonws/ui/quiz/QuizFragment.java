@@ -299,7 +299,8 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     public void onExpiredParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel) { // participant already updated.
         Log.d(TAG, "onFinishParticipantTakenQuiz");
 
-        ListObjects.navigateTo(mContext, new RoomOwnerFragment(), false).commit();
+        ListObjects.fragmentManager(mContext).popBackStack();
+        //RoomOwnerFragment fragment = RoomOwnerFragment.createInstance(currentUser); ListObjects.navigateTo(mContext, fragment, false).commit();
     }
 
     @Override

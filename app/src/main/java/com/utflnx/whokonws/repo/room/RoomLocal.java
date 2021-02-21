@@ -42,6 +42,9 @@ public class RoomLocal implements RoomDataContract {
     public void postPublicParticipant(ParticipantModel participantModel, ActionParticipantCallBack participantCallBack) { }
 
     @Override
+    public void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack) { }
+
+    @Override
     public void getOwnerRoom(UserModel currentUserModel, LoadedRoomListCallback callback) { }
 
     @Override

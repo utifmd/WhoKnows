@@ -32,6 +32,7 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     private ProfileRepository mRepository;
     private QuizRepository quizRepository;
     private View rootView;
+    private UserModel currentUser = new UserModel();
 
     private Button btnSignOut, btnOwnerRoom;
     private TextView textProfile;
@@ -44,9 +45,21 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
         quizRepository = new QuizRepository(context);
     }
 
+    public static ProfileFragment createInstance(UserModel currentUser){
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (getArguments() != null)
+            currentUser = (UserModel)getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
 
         new ProfilePresenter(this, mRepository, quizRepository);
     }
@@ -56,6 +69,7 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
         rootView = inflater.inflate(R.layout.fragment_profile, container, false);
 
         initializeLayout();
+        updateStateLayout(currentUser);
 
         return rootView;
     }
@@ -73,7 +87,9 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     }
 
     private void ownerRoom(View view) {
-        ListObjects.navigateTo(mContext, new RoomOwnerFragment(), true).commit();
+        RoomOwnerFragment fragment = RoomOwnerFragment.createInstance(currentUser);
+
+        ListObjects.navigateTo(mContext, fragment, true).commit();
     }
 
     private void signOut(View view) {
@@ -82,16 +98,12 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
 
     @Override
     public void onProfileLocalLoaded(UserModel currentUserModel) {
-        Log.d(TAG, "onProfileLocalLoaded()");
-
-        mContext.runOnUiThread(() -> updateStateLayout(currentUserModel));
+        Log.d(TAG, "onProfileLocalLoaded()"); //mContext.runOnUiThread(() -> updateStateLayout(currentUserModel));
     }
 
     @Override
     public void onProfileRemoteLoaded(UserModel currentUserModel) {
-        Log.d(TAG, "onProfileRemoteLoaded()");
-
-        updateStateLayout(currentUserModel);
+        Log.d(TAG, "onProfileRemoteLoaded()"); //updateStateLayout(currentUserModel);
     }
 
     @Override

@@ -1,10 +1,15 @@
 package com.utflnx.whokonws.ui.room.publicity;
 
+import android.util.Log;
+
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.QuizModel;
 import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.participant.ParticipantDataContract;
 import com.utflnx.whokonws.repo.participant.ParticipateRepository;
+import com.utflnx.whokonws.repo.profile.ProfileDataContract;
+import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizDataContract;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.repo.room.RoomDataContract;
@@ -16,12 +21,14 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     private final String TAG = getClass().getSimpleName();
     private RoomMainContract.View mView;
     private final RoomRepository mRepository;
+    private final ProfileRepository mProfileRepository;
     private final QuizRepository mQuizRepository;
     private final ParticipateRepository mParticipateRepository;
 
-    public RoomPresenter(RoomMainContract.View mView, RoomRepository repository, QuizRepository quizRepository, ParticipateRepository participateRepository) {
+    public RoomPresenter(RoomMainContract.View mView, RoomRepository repository, ProfileRepository profileRepository, QuizRepository quizRepository, ParticipateRepository participateRepository) {
         this.mView = mView;
         this.mRepository = repository;
+        this.mProfileRepository = profileRepository;
         this.mQuizRepository = quizRepository;
         this.mParticipateRepository = participateRepository;
 
@@ -58,6 +65,24 @@ public class RoomPresenter implements RoomMainContract.Presenter {
             @Override
             public void onRoomResponse(ParticipantModel model) {
                 mView.onRoomTakenSaved(model);
+                mView.onProgressHide();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                mView.onError(t);
+                mView.onProgressHide();
+            }
+        });
+    }
+
+    @Override
+    public void expireRoom(RoomModel currentRoom) {
+        mView.onProgressShow();
+        mRepository.updateCurrentRoom(currentRoom, new RoomDataContract.ActionRoomCallBack() {
+            @Override
+            public void onRoomResponse(RoomModel roomModel) {
+                mView.onRoomExpired(roomModel);
                 mView.onProgressHide();
             }
 
@@ -126,8 +151,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     }
 
     @Override
-    public void detectParticipation(RoomModel roomModel) {
-        mParticipateRepository.getCurrentParticipate(roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
+    public void detectParticipation(UserModel currentUser, RoomModel roomModel) {
+        mParticipateRepository.getCurrentParticipate(currentUser, roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
             @Override
             public void onParticipateExist(ParticipantModel participantModels) {
                 mView.onParticipationExist(participantModels);
@@ -185,10 +210,7 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     }
 
     @Override
-    public void start() {
-        // displayCurrentRoom();
-        // displayCurrentParticipate();
-    }
+    public void start() { }
 
     @Override
     public void destroy() {

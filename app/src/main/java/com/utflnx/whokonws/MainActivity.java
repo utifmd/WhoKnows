@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.utflnx.whokonws.api.utils.ListObjects;
+import com.utflnx.whokonws.model.UserModel;
+import com.utflnx.whokonws.repo.profile.ProfileDataContract;
+import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.ui.dashboard.DashboardFragment;
 import com.utflnx.whokonws.ui.profile.ProfileFragment;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
@@ -21,7 +24,7 @@ import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
  *
  * */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private final String TAG = getClass().getSimpleName();
 
     @Override
