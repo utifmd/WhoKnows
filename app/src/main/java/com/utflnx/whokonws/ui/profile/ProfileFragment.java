@@ -19,11 +19,9 @@ import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
+import com.utflnx.whokonws.ui.AuthenticationListener;
 import com.utflnx.whokonws.ui.dashboard.DashboardFragment;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
-
-// TODO: 26/01/21
-// 1.refresh profile by swipe
 
 public class ProfileFragment extends Fragment implements ProfileMainContract.View {
     private final String TAG = getClass().getSimpleName();
@@ -34,8 +32,11 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     private View rootView;
     private UserModel currentUser = new UserModel();
 
-    private Button btnSignOut, btnOwnerRoom;
-    private TextView textProfile;
+    private Button btnSignOut;
+    private TextView tvFullName, tvPhone, tvMail;
+
+    private AuthenticationListener mAuthenticationListener;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -75,15 +76,18 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     }
 
     private void initializeLayout() {
-        textProfile = rootView.findViewById(R.id.singleProfileText);
+        tvFullName = rootView.findViewById(R.id.tv_full_name);
+        tvPhone = rootView.findViewById(R.id.tv_phone);
+        tvMail = rootView.findViewById(R.id.tv_mail);
         btnSignOut = rootView.findViewById(R.id.btn_sign_out);
-        btnOwnerRoom = rootView.findViewById(R.id.btn_owner_room);
     }
 
     void updateStateLayout(UserModel currentUserModel){
-        textProfile.setText(currentUserModel.getUserName());
+        tvFullName.setText(currentUserModel.getFullName());
+        tvPhone.setText(currentUserModel.getPhone());
+        tvMail.setText(currentUserModel.getEmail());
+
         btnSignOut.setOnClickListener(this::signOut);
-        btnOwnerRoom.setOnClickListener(this::ownerRoom);
     }
 
     private void ownerRoom(View view) {
@@ -120,7 +124,7 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     public void onProfileEmpty() {
         Log.d(TAG, "onProfileEmpty()");
 
-        ListObjects.navigateTo(getContext(), new DashboardFragment(), false).commit();
+        mAuthenticationListener.onSignedOut(); //ListObjects.navigateTo(getContext(), new DashboardFragment(), false).commit();
     }
 
     @Override
@@ -141,6 +145,10 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     @Override
     public void setPresenter(ProfileMainContract.Presenter presenter) {
         mPresenter = presenter;
+    }
+
+    public void setAuthenticationListener(AuthenticationListener authListener){
+        this.mAuthenticationListener = authListener;
     }
 
     @Override

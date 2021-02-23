@@ -38,7 +38,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new GeneralViewHolder((View)
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room_general, parent, false)
+                LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple_general, parent, false)
         );
     }
 

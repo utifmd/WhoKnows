@@ -16,35 +16,6 @@ public class DashboardPresenter implements DashboardContract.Presenter {
     }
 
     @Override
-    public void start() {
-        loadCurrentUser();
-    }
-
-    @Override
-    public void loadCurrentUser() {
-        mView.onProgressShow();
-        profileRepository.getLocalProfile(new ProfileDataContract.LoadedProfileCallBack() {
-            @Override
-            public void onProfileLoaded(UserModel currentUserModel) {
-                mView.onProfileLoaded(currentUserModel);
-                mView.onProgressHide();
-            }
-
-            @Override
-            public void onProfileEmpty() {
-                mView.onProfileEmpty();
-                mView.onProgressHide();
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                mView.onError(t);
-                mView.onProgressHide();
-            }
-        });
-    }
-
-    @Override
     public void saveCurrentUser(UserModel currentUserModel) {
         profileRepository.postLocalProfile(currentUserModel);
     }
@@ -92,9 +63,7 @@ public class DashboardPresenter implements DashboardContract.Presenter {
     }
 
     @Override
-    public void signOut() {
-
-    }
+    public void start() { }
 
     @Override
     public void destroy() {

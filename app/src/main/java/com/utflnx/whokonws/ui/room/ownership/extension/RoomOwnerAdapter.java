@@ -1,15 +1,17 @@
 package com.utflnx.whokonws.ui.room.ownership.extension;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.Chip;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerMainContract;
@@ -54,24 +56,36 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     private static class GeneralViewHolder extends RecyclerView.ViewHolder{
-        TextView textTitle, textNumber;
+        TextView textTitle, textSubtitle;
+        Chip chipTime, chipTrash;
+        Button btnView, btnDelete;
+
         public GeneralViewHolder(@NonNull View itemView) {
             super(itemView);
-            textNumber = itemView.findViewById(R.id.item_number);
-            textTitle = itemView.findViewById(R.id.item_title);
+            textTitle = itemView.findViewById(R.id.tv_title);
+            textSubtitle = itemView.findViewById(R.id.tv_sub_title);
+            chipTime = itemView.findViewById(R.id.chip_time);
+            chipTrash = itemView.findViewById(R.id.chip_uncompleted);
+            btnView = itemView.findViewById(R.id.btn_view);
+            btnDelete = itemView.findViewById(R.id.btn_delete);
         }
 
         public void bind(RoomModel itemRoomModel, int position, RoomOwnerMainContract.Presenter mPresenter) {
-            textNumber.setText(itemRoomModel.getMinute()+" min.");
-            textTitle.setText(itemRoomModel.getDesc());
+            textTitle.setText(itemRoomModel.getTitle());
+            textSubtitle.setText(itemRoomModel.getDesc());
+            chipTime.setText(itemRoomModel.getMinute()+" min.");
 
-            if(itemRoomModel.isExpired())
-                textNumber.setTextColor(Color.parseColor("#5cb85c")); //success | danger ~> #d9534f
-            else
-                textNumber.setTextColor(Color.parseColor("#f0ad4e")); //warning | info ~> #5bc0de
-
-            itemView.setOnClickListener(view -> mPresenter.selectRoomItem(itemRoomModel));
-            itemView.setOnLongClickListener(view -> mPresenter.selectLongRoomItem(itemRoomModel, position));
+            if(itemRoomModel.isExpired()) {
+                ((MaterialCardView) itemView).setChecked(true); // .setTextColor(Color.parseColor("#5cb85c")); //success | danger ~> #d9534f
+                chipTrash.setVisibility(View.GONE);
+                btnDelete.setVisibility(View.GONE);
+            }else {
+                ((MaterialCardView) itemView).setChecked(false); //textNumber.setTextColor(Color.parseColor("#f0ad4e")); //warning | info ~> #5bc0de
+                chipTrash.setVisibility(View.VISIBLE);
+                btnDelete.setVisibility(View.VISIBLE);
+            }
+            btnView.setOnClickListener(view -> mPresenter.selectRoomItem(itemRoomModel));
+            btnDelete.setOnClickListener(view -> mPresenter.selectLongRoomItem(itemRoomModel, position));
         }
     }
 }

@@ -95,7 +95,12 @@ class WhoKnows{
 
             echo $this->onComplete(true, $rows);
         }else if($operation == "fetch_join_by"){
-            $this->onDatabase("SELECT * FROM $this->table INNER JOIN $_table_next_1 ON $_table_next_1.`$str_col` = $this->table.`$str_col` WHERE $this->table.`$str_col` = '$str_row'", false);
+            $this->onDatabase("SELECT * FROM $this->table 
+            INNER JOIN $_table_next_1 ON $_table_next_1.`$str_col_1_container` = $this->table.`$str_col_1_container`
+            INNER JOIN $_table_next_2 ON $_table_next_2.`$str_col_2_container` = $this->table.`$str_col_2_container` 
+            WHERE 
+                $this->table.`$str_col_1_container` = '$str_row_1_container' AND 
+                $this->table.`$str_col_2_container` = '$str_row_2_container'", false);
 
             while($row = $this->query->fetch_assoc()){
                 $rows[] = $row;
@@ -194,9 +199,20 @@ class WhoKnows{
         return json_encode($data, JSON_PRETTY_PRINT);
     }
 }
+$fetchJoinBy = '{
+    "about": "fetch_join_by",
+    "database": "_who_knows",
+    "table": {
+        "name": ["_table_room", "_table_quiz" , "_table_user"],
+        "container":{
+            "roomId":"22f267e0-3f74-403d-a6b2-f7f6d179b49f",
+            "userId": "58eb70f4-0e83-4bf0-aac5-c40f9bad3565"
+        }
+    }
+}';
 
 $case = file_get_contents('php://input');
-    //$fetchCoupleBy;
+    //$fetchJoinBy;
 
 $requests = json_decode($case);
 $whoKnows = new WhoKnows("root", $requests->database, $case);

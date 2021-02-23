@@ -1,117 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_room"
-    android:clickable="true"
-    android:focusable="true"
-    android:checkable="true"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp">
-
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_room"
+        android:clickable="true"
+        android:focusable="true"
+        android:checkable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_margin="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/item_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title"
-                android:textAppearance="?attr/textAppearanceHeadline6"/>
-            <TextView
-                android:id="@+id/room_desc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/description"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary"/>
-            <TextView
-                android:id="@+id/room_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/_30_min"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary"/>
-        </LinearLayout>
-
-        <LinearLayout android:id="@+id/contentList"
-            android:visibility="gone"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/item_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title"
+                    android:textAppearance="?attr/textAppearanceHeadline6"/>
+                <TextView
+                    android:id="@+id/room_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/description"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?android:attr/textColorSecondary"/>
+                <TextView
+                    android:id="@+id/room_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/_30_min"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?android:attr/textColorSecondary"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/contentList"
+                android:visibility="gone"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/btn_copy_room_id"
+                        android:visibility="gone"
+                        android:src="@drawable/ic_baseline_content_copy_24"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:padding="8dp"
+                        android:contentDescription="@string/btn_close_content"
+                        app:tint="@color/design_default_color_primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_add_room_quiz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/new_question"
+                        android:layout_margin="8dp"
+                        style="?attr/borderlessButtonStyle"/>
+                </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/mRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <include android:id="@+id/contentEmpty"
+                    android:visibility="gone" layout="@layout/item_empty"/>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/contentPublicRoom"
+                android:visibility="gone"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <ImageView android:id="@+id/btn_copy_room_id"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_baseline_content_copy_24"
+                <ImageView android:id="@+id/btn_close_content"
+                    android:src="@drawable/ic_baseline_power_settings_new_24"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:clickable="true"
-                    android:focusable="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:padding="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:contentDescription="@string/btn_close_content"
                     app:tint="@color/design_default_color_primary" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_add_room_quiz"
+                    android:id="@+id/btn_take_room"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/new_question"
+                    android:text="@string/participate"
                     android:layout_margin="8dp"
                     style="?attr/borderlessButtonStyle"/>
             </LinearLayout>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/mRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            <include android:id="@+id/contentEmpty"
-                android:visibility="gone" layout="@layout/item_empty"/>
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="16dp"/>
         </LinearLayout>
 
-        <LinearLayout android:id="@+id/contentPublicRoom"
-            android:visibility="gone"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView android:id="@+id/btn_close_content"
-                android:src="@drawable/ic_baseline_power_settings_new_24"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:padding="8dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="@string/btn_close_content"
-                app:tint="@color/design_default_color_primary" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_take_room"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/participate"
-                android:layout_margin="8dp"
-                style="?attr/borderlessButtonStyle"/>
-        </LinearLayout>
-    </LinearLayout>
-
-</com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

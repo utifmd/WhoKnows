@@ -4,12 +4,16 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,15 +48,12 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
 
     private View rootView, contentSubmit, contentList, contentEmpty, btnClosePost, btnCreateRoom;
     private RecyclerView recyclerView;
+    private RoomOwnerAdapter adapter;
     private TextInputLayout inpTitle, inpDesc, inpMinute;
 
     private UserModel currentUser;
-
-    private ExtendedFloatingActionButton btnExpandFab;
-    private FloatingActionButton btnDisplayPoster, btnDisplayFinder;
     private Boolean isAllFabVisible = false;
 
-    private RoomOwnerAdapter adapter;
     private ArrayList<RoomModel> mRoomModelArrayList = new ArrayList<>();
 
     @Override
@@ -106,8 +107,6 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
 
         if (currentUser != null) mPresenter.displayOwnerRoom(currentUser);
 
-        showHideFabMenu(rootView);
-
         return rootView;
     }
 
@@ -123,11 +122,6 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
         adapter.setPresenter(mPresenter);
         adapter.setData(mRoomModelArrayList);
         recyclerView.setAdapter(adapter);
-    }
-
-    private void displayJoinRoom(View btnView) {
-        RoomFragment fragment = RoomFragment.createInstance(currentUser, null, true);
-        ListObjects.navigateTo(mContext, fragment, true).commit(); // ListObjects.visibleGoneView(new View[]{contentFind}, contentList, contentSubmit);
     }
 
     private void displayEmpty(View btnView) {
@@ -155,40 +149,20 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
             Snackbar.make(rootView, R.string.invalid_input, Snackbar.LENGTH_SHORT).show();
     }
 
-    private void showHideFabMenu(View view) {
-        if (isAllFabVisible) {
-            btnDisplayFinder.show();
-            btnDisplayPoster.show();
-            btnExpandFab.extend();
-            isAllFabVisible = false;
-        } else {
-            btnDisplayFinder.hide();
-            btnDisplayPoster.hide();
-            btnExpandFab.shrink();
-            isAllFabVisible = true;
-        }
-    }
-
     private void initializeLayout(View rootView) {
         contentSubmit = rootView.findViewById(R.id.contentSubmit);
         contentList = rootView.findViewById(R.id.contentList);
         recyclerView = rootView.findViewById(R.id.mRecyclerView);
         contentEmpty = rootView.findViewById(R.id.contentEmpty);
         btnCreateRoom = rootView.findViewById(R.id.btn_create_room);
-        btnExpandFab = rootView.findViewById(R.id.fab_extend);
-        btnDisplayPoster = rootView.findViewById(R.id.fab_post);
-        btnDisplayFinder = rootView.findViewById(R.id.fab_find);
         btnClosePost = rootView.findViewById(R.id.btn_close_submit);
-
         inpTitle = rootView.findViewById(R.id.text_input_room_title);
         inpDesc = rootView.findViewById(R.id.text_input_room_desc);
         inpMinute = rootView.findViewById(R.id.text_input_room_time);
 
         btnCreateRoom.setOnClickListener(this::createRoom);
         btnClosePost.setOnClickListener(this::displayListRoom);
-        btnDisplayPoster.setOnClickListener(this::displaySubmitRoom);
-        btnDisplayFinder.setOnClickListener(this::displayJoinRoom);
-        btnExpandFab.setOnClickListener(this::showHideFabMenu);
+        ((Toolbar)rootView.findViewById(R.id.toolbar_fragment)).setOnMenuItemClickListener(this::onOptionsItemSelected);
     }
 
     @Override
@@ -265,6 +239,15 @@ public class RoomOwnerFragment extends Fragment implements RoomOwnerMainContract
     @Override
     public void onProgressHide() {
         Log.d(TAG, "onProgress done.");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.d(TAG, "onOptionsItemSelected");
+        if (item.getItemId() == R.id.page_submit_room)
+            displaySubmitRoom(rootView);
+
+        return true; //super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -77,6 +77,19 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         mProfileRepository = new ProfileRepository(context);
     }
 
+    public static QuizFragment createInstance(int key, RoomModel roomModel, ParticipantModel participantModel){
+        QuizFragment fragment = new QuizFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putInt(KEY_TYPE_FRAGMENT, key);
+        bundle.putSerializable(KEY_ROOM_FRAGMENT, roomModel);
+        if(participantModel != null) bundle.putSerializable(KEY_PARTICIPANT_FRAGMENT, participantModel);
+
+        fragment.setArguments(bundle);
+
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,19 +111,6 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
             mViewType = getArguments().getInt(KEY_TYPE_FRAGMENT);
         }
-    }
-
-    public static QuizFragment createInstance(int key, RoomModel roomModel, ParticipantModel participantModel){
-        QuizFragment fragment = new QuizFragment();
-        Bundle bundle = new Bundle();
-
-        bundle.putInt(KEY_TYPE_FRAGMENT, key);
-        bundle.putSerializable(KEY_ROOM_FRAGMENT, roomModel);
-        if(participantModel != null) bundle.putSerializable(KEY_PARTICIPANT_FRAGMENT, participantModel);
-
-        fragment.setArguments(bundle);
-
-        return fragment;
     }
 
     @Nullable @Override

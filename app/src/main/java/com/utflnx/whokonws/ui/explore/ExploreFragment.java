@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.utflnx.whokonws.R;
+import com.utflnx.whokonws.api.utils.ListObjects;
+import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.explore.ExploreRepository;
 
@@ -21,6 +23,8 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
     private final String TAG = getClass().getSimpleName();
     private ExploreMainContract.Presenter mPresenter;
     private ExploreRepository mRepository;
+
+    private UserModel mCurrentUser = null;
 
     @Override
     public void setPresenter(ExploreMainContract.Presenter presenter) {
@@ -34,10 +38,23 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
         mRepository = new ExploreRepository(context);
     }
 
+    public static ExploreFragment createInstance(UserModel currentUser){
+        ExploreFragment explore = new ExploreFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
+        explore.setArguments(bundle);
+
+        return explore;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate()");
+
+        if (getArguments() != null)
+            mCurrentUser = (UserModel) getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
 
         new ExplorePresenter(this, mRepository);
     }
@@ -49,31 +66,15 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
         rootView.findViewById(R.id.singleExploreText).setOnClickListener(view -> {
             Log.d(TAG, "singleTextExplore clicked!");
 
-//            User user = new User();
-//            mPresenter.editUser(user);
         });
 
         return rootView;
     }
 
-    @Override
-    public void onUsersLoaded(List<UserModel> userModelList) {
-        Log.d(TAG, "User retrofit size are "+ userModelList.size());
-    }
 
     @Override
-    public void onUserSaved(UserModel userModel) {
-        Log.d(TAG, "User "+ userModel.getFullName()+" successfully added.");
-    }
-
-    @Override
-    public void onUserUpdated(UserModel userModel) {
-        Log.d(TAG, "User "+ userModel.getFullName()+" successfully updated.");
-    }
-
-    @Override
-    public void onUserDeleted(UserModel userModel) {
-        Log.d(TAG, "User with id: "+ userModel.getUserId()+" successfully removed.");
+    public void onExploreLoaded(RoomModel roomModel) {
+        Log.d(TAG, "onExploreLoaded");
     }
 
     @Override
@@ -84,11 +85,6 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
     @Override
     public void onProgressHide() {
         Log.d(TAG, "progress done.");
-    }
-
-    @Override
-    public void onUsersEmpty() {
-        Log.d(TAG, "User Empty");
     }
 
     @Override

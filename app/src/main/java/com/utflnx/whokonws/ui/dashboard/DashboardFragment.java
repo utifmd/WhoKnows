@@ -16,12 +16,13 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.utflnx.whokonws.MainActivity;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
+import com.utflnx.whokonws.ui.AuthenticationListener;
 import com.utflnx.whokonws.ui.explore.ExploreFragment;
-import com.utflnx.whokonws.ui.profile.ProfileFragment;
 
 import java.util.UUID;
 
@@ -38,6 +39,12 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     private final int VIEW_TYPE_GENERAL = 0;
     private final int VIEW_TYPE_SIGN_IN = 1;
     private final int VIEW_TYPE_REGISTER = 2;
+
+    private AuthenticationListener mAuthenticationListener;
+
+    public void setAuthListener(AuthenticationListener authListener){
+        this.mAuthenticationListener = authListener;
+    }
 
     @Override
     public void setPresenter(DashboardContract.Presenter presenter) {
@@ -69,21 +76,10 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     }
 
     @Override
-    public void onProfileLoaded(UserModel currentUserModel) {
-        Log.d(TAG, "onProfileLoaded()");
-        ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel);
-
-        ListObjects.navigateTo(getContext(), fragment, false).commit();
-    }
-
-    @Override
     public void onSignedIn(UserModel currentUserModel) {
         Log.d(TAG, "onSignedIn()");
-        ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel);
         mPresenter.saveCurrentUser(currentUserModel);
-        Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show();
-
-        ListObjects.navigateTo(getContext(), fragment, false).commit();
+        mAuthenticationListener.onSignedIn(currentUserModel); //Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show(); // ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel); ListObjects.navigateTo(getContext(), fragment, false).commit();
     }
 
     @Override
@@ -103,15 +99,6 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
         }
 
         Snackbar.make(rootView, "Successfully signed up as "+ userModel.getEmail()+", please login.", Snackbar.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onProfileDeleted(UserModel userModel) {}
-
-    @Override
-    public void onSignedOut() {
-        Log.d(TAG, "onSignedOut()");
-        ListObjects.navigateTo(getContext(), new DashboardFragment(), false).commit();
     }
 
     @Override

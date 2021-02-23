@@ -9,5 +9,7 @@
         android:visibility="gone"
         layout="@layout/fragment_room_join"/>
 
-    <include layout="@layout/card_room_quiz"/>
+    <include android:id="@+id/contentInside"
+        android:visibility="gone"
+        layout="@layout/card_room_quiz"/>
 </LinearLayout>

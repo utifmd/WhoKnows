@@ -54,4 +54,8 @@
     <string name="_30_min">30 min</string>
     <string name="publish">Publish</string>
     <string name="room_id_copy">room id</string>
+    <string name="open">open</string>
+    <string name="delete">Delete</string>
+    <string name="uncompleted">uncompleted</string>
+    <string name="view">view</string>
 </resources>

@@ -31,7 +31,7 @@ public class ResultAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     @NonNull @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new GeneralViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room_general, parent, false));
+        return new GeneralViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_simple_general, parent, false));
     }
 
     @Override

@@ -51,7 +51,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private QuizRepository quizRepository;
     private ParticipateRepository participateRepository;
     private FragmentActivity mContext;
-    private View rootView, contentPublicRoom, contentJoin, contentList, btnCloseContent, contentEmpty, btnCopyRoomId;
+    private View rootView, contentPublicRoom, contentInside, contentJoin, contentList, btnCloseContent, contentEmpty, btnCopyRoomId;
     private TextInputLayout inpRoomId;
     private TextView roomTitle, roomDesc, roomTime;
     private MaterialCardView cardRoom;
@@ -119,22 +119,13 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         return rootView;
     }
 
-    private void joinRoom(View btnView){
-        EditText etRoomId = inpRoomId.getEditText();
-
-        if (etRoomId != null){
-            if (!etRoomId.getText().toString().trim().isEmpty())
-                mPresenter.joinRoom(etRoomId.getText().toString().trim());
-            else
-                Snackbar.make(rootView, R.string.form_cant_empty, Snackbar.LENGTH_SHORT).show();
-        }else
-            Snackbar.make(rootView, R.string.invalid_input, Snackbar.LENGTH_SHORT).show();
-    }
-
     private void initializeLayout(View rootView){
-        cardRoom = rootView.findViewById(R.id.card_room);
-        contentPublicRoom = rootView.findViewById(R.id.contentPublicRoom);
+
+        contentInside = rootView.findViewById(R.id.contentInside);
         contentJoin = rootView.findViewById(R.id.contentJoin);
+        cardRoom = rootView.findViewById(R.id.card_room);
+
+        contentPublicRoom = rootView.findViewById(R.id.contentPublicRoom);
         contentList = rootView.findViewById(R.id.contentList);
         contentEmpty = rootView.findViewById(R.id.contentEmpty);
 
@@ -150,6 +141,26 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         inpRoomId = rootView.findViewById(R.id.text_input_room_id);
 
         recyclerView = rootView.findViewById(R.id.mRecyclerView);
+
+    }
+
+    private void displayRoom(){
+        if (currentRoomModel != null)
+            mPresenter.displayRoomQuizList(currentRoomModel);
+        else
+            mPresenter.displayCurrentRoom();
+    }
+
+    private void joinRoom(View btnView){
+        EditText etRoomId = inpRoomId.getEditText();
+
+        if (etRoomId != null){
+            if (!etRoomId.getText().toString().trim().isEmpty())
+                mPresenter.joinRoom(etRoomId.getText().toString().trim());
+            else
+                Snackbar.make(rootView, R.string.form_cant_empty, Snackbar.LENGTH_SHORT).show();
+        }else
+            Snackbar.make(rootView, R.string.invalid_input, Snackbar.LENGTH_SHORT).show();
     }
 
     private void setHeaderRoom(RoomModel roomModel) {
@@ -179,13 +190,13 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     private void displayPublicJoin(){
-        ListObjects.visibleGoneView(new View[]{contentJoin}, contentPublicRoom, contentList);
+        ListObjects.visibleGoneView(new View[]{contentJoin}, contentInside, contentPublicRoom, contentList);
 
         btnJoinRoom.setOnClickListener(this::joinRoom);
     }
 
     private void displayPublicRoom(int state){
-        ListObjects.visibleGoneView(new View[]{contentPublicRoom}, contentJoin, contentList);
+        ListObjects.visibleGoneView(new View[]{contentInside, contentPublicRoom}, contentJoin, contentList);
 
         switch (state){
             case KEY_ROOM_GENERAL:
@@ -204,31 +215,23 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         }
 
         btnCloseContent.setOnClickListener(this::signOutOverRoom);
-
     }
 
     private void displayOwnerList(List<QuizModel> quizModelList){
         if (quizModelList.isEmpty()){
-            ListObjects.visibleGoneView(new View[]{contentList, contentEmpty}, recyclerView, contentPublicRoom, contentJoin, contentEmpty);
+            ListObjects.visibleGoneView(new View[]{contentInside, contentList, contentEmpty}, recyclerView, contentPublicRoom, contentJoin, contentEmpty);
 
+            setHeaderRoom(currentRoomModel);
         }else {
-            ListObjects.visibleGoneView(new View[]{contentList, recyclerView}, contentEmpty, contentPublicRoom, contentJoin, contentEmpty);
+            ListObjects.visibleGoneView(new View[]{contentInside, contentList, recyclerView}, contentEmpty, contentPublicRoom, contentJoin, contentEmpty);
 
+            setHeaderRoom(currentRoomModel);
             recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
             recyclerView.setHasFixedSize(true);
             roomAdapter.setData(quizModelList);
             roomAdapter.setPresenter(mPresenter);
             recyclerView.setAdapter(roomAdapter);
         }
-    }
-
-    private void displayRoom(){
-        if (currentRoomModel != null) {
-            setHeaderRoom(currentRoomModel);
-            mPresenter.displayRoomQuizList(currentRoomModel);
-
-        }else
-            mPresenter.displayCurrentRoom();
     }
 
     private void createQuiz(View view) {
@@ -280,7 +283,6 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onRoomRemoteLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
         Log.d(TAG, "onRoomRemoteLoaded()");
         mPresenter.saveCurrentRoom(roomModel);
-        setHeaderRoom(roomModel);
 
         if (currentUser != null)
             mPresenter.detectParticipation(currentUser, roomModel);
@@ -289,7 +291,6 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     @Override
     public void onRoomLocalLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
         Log.d(TAG, "onRoomLocalLoaded()");
-        mContext.runOnUiThread(() -> setHeaderRoom(roomModel));
 
         if (currentUser != null)
             mPresenter.detectParticipation(currentUser, roomModel);
@@ -315,7 +316,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onRoomExpired(RoomModel roomModel) {
+    public void onRoomExpired(RoomModel roomModel) { currentRoomModel = roomModel;
         Log.d(TAG, "onRoomExpired");
 
         Snackbar.make(rootView, "Successfully publish, share this room to participants by copy the room Id.", Snackbar.LENGTH_LONG).show();
@@ -329,8 +330,10 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         if (isStateByOwner)
             displayOwnerList(quizModelList);
-        else
+        else {
+            setHeaderRoom(currentRoomModel);
             displayPublicRoom(KEY_ROOM_CONTINUE);
+        }
     }
 
     @Override
@@ -361,6 +364,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
 
+        setHeaderRoom(currentRoomModel);
         displayPublicRoom(KEY_ROOM_CONTINUE);
     }
 
@@ -370,6 +374,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
 
+        setHeaderRoom(currentRoomModel);
         displayPublicRoom(KEY_ROOM_FINISH);
     }
 
@@ -379,6 +384,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         Snackbar.make(rootView, "Welcome to the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
 
+        setHeaderRoom(currentRoomModel);
         displayPublicRoom(KEY_ROOM_GENERAL);
     }
 
