@@ -58,4 +58,6 @@
     <string name="delete">Delete</string>
     <string name="uncompleted">uncompleted</string>
     <string name="view">view</string>
+    <string name="completed">completed</string>
+    <string name="sample_question">Bagaiimana cara mnemukan jalan karir yang benar?</string>
 </resources>

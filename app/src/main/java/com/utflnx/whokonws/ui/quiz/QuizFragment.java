@@ -100,7 +100,7 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
             Serializable roomModel = getArguments().getSerializable(KEY_ROOM_FRAGMENT);
             Serializable participantModel = getArguments().getSerializable(KEY_PARTICIPANT_FRAGMENT);
 
-            if (roomModel instanceof RoomModel){ Log.d(TAG, "room model called.");
+            if (roomModel instanceof RoomModel){
                 currentRoomModel = (RoomModel) roomModel;
             }
 
@@ -182,9 +182,10 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
     private void createOwnerQuiz(View view) {
         EditText etQuestion = inpQuestion.getEditText(), etOptA = inpOptA.getEditText(), etOptB = inpOptB.getEditText(), etOptC = inpOptC.getEditText(), etOptD = inpOptD.getEditText(), etOptE = inpOptE.getEditText();
-        QuizModel mQuizModel = new QuizModel();
         if (creatorSelectedAnswer != null && etQuestion != null && etOptA != null && etOptB != null && etOptC != null && etOptD != null && etOptE != null){
             if (!creatorSelectedAnswer.isEmpty() && !etQuestion.getText().toString().isEmpty() && !etOptA.getText().toString().isEmpty() && !etOptB.getText().toString().isEmpty() && !etOptC.getText().toString().isEmpty() && !etOptD.getText().toString().isEmpty() && !etOptE.getText().toString().isEmpty()){
+
+                QuizModel mQuizModel = new QuizModel();
                 mQuizModel.setQuizId(UUID.randomUUID().toString());
                 mQuizModel.setRoomId(currentRoomModel.getRoomId());
                 mQuizModel.setImageUrl("http://image_url.com/image1.png");
@@ -276,7 +277,7 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         Log.d(TAG, "onRoomQuizListLoaded");
         viewPageSum = quizModelList.size()-1;
 
-        setUpTakenQuiz(quizModelList);
+        mContext.runOnUiThread(()-> setUpTakenQuiz(quizModelList));
     }
 
     @Override
@@ -292,7 +293,7 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     public void onOwnerQuizRemoteSaved(QuizModel quizModel) {
         Log.d(TAG, "onQuizRemoteSaved");
 
-        clearSetup(rootView);
+        mContext.runOnUiThread(() -> clearSetup(rootView));
     }
 
     @Override

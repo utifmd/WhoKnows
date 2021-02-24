@@ -21,31 +21,5 @@ public class ExploreLocal implements ExploreDataContract {
     }
 
     @Override
-    public void getUsers(LoadedExploreCallback loadedExploreCallback) {
-//        mExecutorService.execute(() -> {
-//            if (mLocalService.getAllUsers().size() != 0) {
-//                loadedExploreCallback.onUsersLoaded(mLocalService.getAllUsers());
-//            }else {
-//                loadedExploreCallback.onUsersEmpty();
-//            }
-//        });
-    }
-
-    @Override
-    public void postUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-        mExecutorService.execute(() ->
-                mLocalService.addUser(userModel)
-        );
-        actionExploreCallback.onUserResponse(userModel);
-    }
-
-    @Override
-    public void deleteUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-
-    }
-
-    @Override
-    public void updateUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-
-    }
+    public void getExplores(LoadedExploreCallback loadedExploreCallback) { }
 }

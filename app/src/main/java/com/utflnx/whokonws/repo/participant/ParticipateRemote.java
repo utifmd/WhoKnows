@@ -13,6 +13,7 @@ import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.model.UserModel;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -29,7 +30,7 @@ public class ParticipateRemote implements ParticipantDataContract {
 
     @Override
     public void getCurrentParticipate(UserModel currentUser, RoomModel roomModel, LoadedParticipantCallback participantCallback) {
-        HashMap<String, String> container = new HashMap<>();
+        LinkedHashMap<String, String> container = new LinkedHashMap<>();
         container.put("userId", currentUser.getUserId());
         container.put("roomId", roomModel.getRoomId());
 /*

@@ -6,9 +6,13 @@ import android.util.Log;
 import com.utflnx.whokonws.api.module.RemoteModule;
 import com.utflnx.whokonws.api.service.RemoteService;
 import com.utflnx.whokonws.model.APIRequestModel;
+import com.utflnx.whokonws.model.ExploreModel;
+import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.api.utils.ListObjects;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -24,85 +28,58 @@ public class ExploreRemote implements ExploreDataContract {
     }
 
     @Override
-    public void getUsers(LoadedExploreCallback loadedExploreCallback) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_FETCH_ONLY, new String[]{ListObjects.TABLE_USER}, null, null, null);
+    public void getExplores(LoadedExploreCallback loadedExploreCallback) {
+        LinkedHashMap<String, String> container = new LinkedHashMap<>();
+        container.put("roomId", "null");
+        container.put("userId", "null");
 
-        mRemoteService.getAllUsers(APIRequestModel).enqueue(new Callback<List<UserModel>>() {
+        APIRequestModel requestModel = RemoteModule.passingRequestModel(
+                ListObjects.ABOUT_FETCH_JOIN_COUPLE_BY_PARAM,
+                new String[]{ListObjects.TABLE_ROOM, ListObjects.TABLE_QUIZ, ListObjects.TABLE_USER},
+                container, null, "LIMIT 10"); //"WHERE expired = 1 LIMIT 10"); //"WHERE expired = 0 LIMIT 10"
+
+        mRemoteService.getExplore(requestModel).enqueue(new Callback<List<ExploreModel>>() {
             @Override
-            public void onResponse(Call<List<UserModel>> call, Response<List<UserModel>> response) {
-                if (response.body() != null) {
-                    if (!response.body().isEmpty()) loadedExploreCallback.onUsersLoaded(response.body());
-                    else loadedExploreCallback.onUsersEmpty();
+            public void onResponse(Call<List<ExploreModel>> call, Response<List<ExploreModel>> response) {
+                if (response.body() != null){
+                    if(response.body().size() != 0)
+                        loadedExploreCallback.onExploreLoaded(response.body());
+                    else
+                        loadedExploreCallback.onExploreEmpty();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<UserModel>> call, Throwable t) {
+            public void onFailure(Call<List<ExploreModel>> call, Throwable t) {
                 loadedExploreCallback.onError(t);
             }
         });
     }
 
-    @Override
-    public void postUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null, null);
+    public void getExploresBy(UserModel userModel, RoomModel roomModel, LoadedExploreCallback loadedExploreCallback) {
+        LinkedHashMap<String, String> container = new LinkedHashMap<>();
+        container.put("roomId", roomModel.getRoomId());
+        container.put("userId", userModel.getUserId());
 
-        mRemoteService.postUser(APIRequestModel).enqueue(new Callback<String>() {
+        APIRequestModel requestModel = RemoteModule.passingRequestModel(
+                ListObjects.ABOUT_FETCH_JOIN_BY,
+                new String[]{ListObjects.TABLE_ROOM, ListObjects.TABLE_QUIZ, ListObjects.TABLE_USER},
+                container, null,null);
+
+        mRemoteService.getExplore(requestModel).enqueue(new Callback<List<ExploreModel>>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.d(TAG, response.message());
-                if (response.body() != null) {
-                    actionExploreCallback.onUserResponse(userModel);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                actionExploreCallback.onError(t);
-            }
-        });
-    }
-
-    @Override
-    public void deleteUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_DELETE, new String[]{ListObjects.TABLE_USER}, userModel, null, null);
-
-        mRemoteService.deleteUser(APIRequestModel).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.d(TAG, response.message());
-                if (response.body() != null) {
-                    actionExploreCallback.onUserResponse(userModel);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                actionExploreCallback.onError(t);
-            }
-        });
-    }
-
-    @Override
-    public void updateUser(UserModel userModel, ActionExploreCallback actionExploreCallback) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
-                ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_USER}, userModel, null,"userId = "+ userModel.getUserId());
-
-        mRemoteService.updateUser(APIRequestModel).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.d(TAG, response.message());
+            public void onResponse(Call<List<ExploreModel>> call, Response<List<ExploreModel>> response) {
                 if (response.body() != null){
-                    actionExploreCallback.onUserResponse(userModel);
+                    if(response.body().size() != 0)
+                        loadedExploreCallback.onExploreLoaded(response.body());
+                    else
+                        loadedExploreCallback.onExploreEmpty();
                 }
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                actionExploreCallback.onError(t);
+            public void onFailure(Call<List<ExploreModel>> call, Throwable t) {
+                loadedExploreCallback.onError(t);
             }
         });
     }

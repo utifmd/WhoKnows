@@ -28,13 +28,14 @@ public class QuizRemote implements QuizDataContract {
 
     @Override
     public void postQuizRemote(QuizModel quizModel, ActionQuizCallback callback) {
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
+        APIRequestModel requestModel = RemoteModule.passingRequestModel(
                 ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_QUIZ}, quizModel, null, null);
 
-        remoteService.postQuizRoom(APIRequestModel).enqueue(new Callback<String>() {
+        remoteService.postQuizRoom(requestModel).enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.body() != null) callback.onQuizResponse(quizModel);
+                else callback.onError(new Throwable("Invalid server response."));
             }
 
             @Override
@@ -52,10 +53,10 @@ public class QuizRemote implements QuizDataContract {
         HashMap<String, String> container = new HashMap<>();
         container.put("roomId", roomModel.getRoomId());
 
-        APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(
+        APIRequestModel requestModel = RemoteModule.passingRequestModel(
                 ListObjects.ABOUT_FETCH_JOIN_BY, new String[]{ListObjects.TABLE_QUIZ, ListObjects.TABLE_ROOM}, container, null, null);
 
-        remoteService.getRoomQuizList(APIRequestModel).enqueue(new Callback<List<QuizModel>>() {
+        remoteService.getRoomQuizList(requestModel).enqueue(new Callback<List<QuizModel>>() {
             @Override
             public void onResponse(Call<List<QuizModel>> call, Response<List<QuizModel>> response) {
                 if (response.body() != null){

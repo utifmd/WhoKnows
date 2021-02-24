@@ -22,9 +22,13 @@ import com.utflnx.whokonws.ui.profile.ProfileFragment;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
 
 
-// TODO: 23/02/21  
-/* 1. explore features
- * 2.
+
+// TODO: 24/02/21
+/*
+ * 1. empty content to explore
+ * 2. grid view for owner room
+ * 3. one more relation it is Result Table -> roomId to get participant size
+ * 4. warning: There are multiple good constructors and Room will pick the no-arg constructor. You can use the @Ignore annotation to eliminate unwanted constructors.
  * */
 
 public class MainActivity extends AppCompatActivity implements

@@ -9,22 +9,36 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
-import com.utflnx.whokonws.model.RoomModel;
+import com.utflnx.whokonws.model.ExploreModel;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.explore.ExploreRepository;
+import com.utflnx.whokonws.ui.explore.extension.ExploreAdapter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ExploreFragment extends Fragment implements ExploreMainContract.View {
     private final String TAG = getClass().getSimpleName();
     private ExploreMainContract.Presenter mPresenter;
     private ExploreRepository mRepository;
+    private FragmentActivity mContext;
+    private View rootView;
 
     private UserModel mCurrentUser = null;
+
+    private RecyclerView mRecyclerView;
+    private ExploreAdapter mExploreAdapter;
+    private View mContentEmpty;
 
     @Override
     public void setPresenter(ExploreMainContract.Presenter presenter) {
@@ -35,17 +49,17 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
+        mContext = (FragmentActivity) context;
         mRepository = new ExploreRepository(context);
     }
 
     public static ExploreFragment createInstance(UserModel currentUser){
-        ExploreFragment explore = new ExploreFragment();
+        ExploreFragment fragment = new ExploreFragment();
         Bundle bundle = new Bundle();
 
         bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
-        explore.setArguments(bundle);
-
-        return explore;
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
@@ -61,20 +75,32 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_explore, container, false);
+        rootView = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        rootView.findViewById(R.id.singleExploreText).setOnClickListener(view -> {
-            Log.d(TAG, "singleTextExplore clicked!");
-
-        });
+        initializeLayout();
 
         return rootView;
     }
 
+    private void initializeLayout() {
+        mExploreAdapter = new ExploreAdapter();
+        mRecyclerView = rootView.findViewById(R.id.mRecyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mRecyclerView.setHasFixedSize(true);
+
+        mContentEmpty = rootView.findViewById(R.id.contentEmpty);
+    }
 
     @Override
-    public void onExploreLoaded(RoomModel roomModel) {
+    public void onExploreLoaded(List<ExploreModel> exploreModels) {
         Log.d(TAG, "onExploreLoaded");
+        mContext.runOnUiThread(()-> replaceWithList(exploreModels));
+    }
+
+    @Override
+    public void onExploreEmpty() {
+        Log.d(TAG, "onExploreEmpty");
+        mContext.runOnUiThread(this::replaceWithEmpty);
     }
 
     @Override
@@ -90,6 +116,14 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
     @Override
     public void onError(Throwable e) {
         Log.d(TAG, "Explore error "+ e.getLocalizedMessage());
+    }
+    private void replaceWithList(List<ExploreModel> exploreModels) {
+        mExploreAdapter.setData(exploreModels);
+        mRecyclerView.setAdapter(mExploreAdapter);
+    }
+
+    private void replaceWithEmpty() {
+        ListObjects.visibleGoneView(new View[]{mContentEmpty}, mRecyclerView);
     }
 
     @Override

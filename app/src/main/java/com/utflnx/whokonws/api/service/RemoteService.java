@@ -1,5 +1,6 @@
 package com.utflnx.whokonws.api.service;
 
+import com.utflnx.whokonws.model.ExploreModel;
 import com.utflnx.whokonws.model.ParticipantModel;
 import com.utflnx.whokonws.model.QuizModel;
 import com.utflnx.whokonws.model.APIRequestModel;
@@ -63,4 +64,7 @@ public interface RemoteService {
 
     @POST(ListObjects.PARAM_WHO_KNOWS_URL)
     Call<List<ResultModel>> getResultBy(@Body APIRequestModel APIRequestModel);
+
+    @POST(ListObjects.PARAM_WHO_KNOWS_URL)
+    Call<List<ExploreModel>> getExplore(@Body APIRequestModel APIRequestModel);
 }

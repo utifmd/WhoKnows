@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,7 +30,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     private ResultRepository mResultRepository;
     private final static String KEY_RESULT_FRAGMENT = "KeyResultFragment";
     private View rootView, contentEmpty;
-    private Context mContext;
+    private FragmentActivity mContext;
 
     private RoomModel currentRoomModel = null;
     private RecyclerView mRecyclerView;
@@ -48,7 +49,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        mContext = context;
+        mContext = (FragmentActivity) context;
         mResultRepository = new ResultRepository(context);
     }
 
@@ -82,10 +83,8 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onResultDisplay(List<ResultModel> resultModels) {
         Log.d(TAG, "onResultDisplay");
-        ListObjects.visibleGoneView(new View[]{mRecyclerView}, contentEmpty);
 
-        mAdapter.setData(resultModels);
-        mRecyclerView.setAdapter(mAdapter);
+        mContext.runOnUiThread(() -> replaceWithList(resultModels));
     }
 
     @Override
@@ -101,14 +100,24 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onResultEmpty() {
         Log.d(TAG, "onResultEmpty");
-        ListObjects.visibleGoneView(new View[]{contentEmpty}, mRecyclerView);
+        mContext.runOnUiThread(this::replaceWithEmpty);
     }
 
     @Override
     public void onError(Throwable t) {
-        String message = "Sorry, "+t.getLocalizedMessage();
-        Log.d(TAG, message);
+        String message = "Sorry, "+t.getLocalizedMessage(); Log.d(TAG, message);
         Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void replaceWithList(List<ResultModel> resultModels) {
+        ListObjects.visibleGoneView(new View[]{mRecyclerView}, contentEmpty);
+
+        mAdapter.setData(resultModels);
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
+    private void replaceWithEmpty() {
+        ListObjects.visibleGoneView(new View[]{contentEmpty}, mRecyclerView);
     }
 
     @Override

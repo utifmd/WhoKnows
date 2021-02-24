@@ -1,11 +1,12 @@
 package com.utflnx.whokonws.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.List;
 
-public class QuizModel implements Serializable {
+public class QuizModel extends RoomModel implements Serializable {
     private String quizId;
-    private String roomId;
     private String question;
     private String imageUrl;
     private String optA;
@@ -21,14 +22,6 @@ public class QuizModel implements Serializable {
 
     public void setQuizId(String quizId) {
         this.quizId = quizId;
-    }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
     }
 
     public String getQuestion() {

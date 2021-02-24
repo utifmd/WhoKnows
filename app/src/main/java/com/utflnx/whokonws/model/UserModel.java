@@ -14,10 +14,10 @@ import java.util.Arrays;
 
 @Entity(tableName = ListObjects.TABLE_CURRENT_USER)
 public class UserModel implements Serializable {
-
-    @PrimaryKey()
-    @NonNull()
-    private String userId = "";
+    @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "userId")
+    private String userId;
 
     @ColumnInfo(name = "fullName")
     private String fullName;

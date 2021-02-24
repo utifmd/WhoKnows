@@ -27,6 +27,8 @@ public class ListObjects {
     public static final String ABOUT_FETCH_SINGLE = "fetch_single";
     public static final String ABOUT_FETCH_COUPLE_BY = "fetch_couple_by";
     public static final String ABOUT_FETCH_JOIN = "fetch_join";
+    public static final String ABOUT_FETCH_JOIN_COUPLE = "fetch_join_couple";
+    public static final String ABOUT_FETCH_JOIN_COUPLE_BY_PARAM = "fetch_join_couple_by_param";
     public static final String ABOUT_FETCH_JOIN_BY = "fetch_join_by";
     public static final String ABOUT_FETCH_SIGN_IN = "fetch_sign_in";
     public static final String ABOUT_POST_ONLY = "post_only";

@@ -119,6 +119,143 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         return rootView;
     }
 
+    @Override
+    public void onRoomRemoteLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
+        Log.d(TAG, "onRoomRemoteLoaded()");
+        try {
+            mPresenter.saveCurrentRoom(roomModel);
+
+            if (currentUser != null)
+                mPresenter.detectParticipation(currentUser, roomModel);
+        }catch (Exception e){
+            onError(e);
+        }
+    }
+
+    @Override
+    public void onRoomLocalLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
+        Log.d(TAG, "onRoomLocalLoaded()");
+
+        if (currentUser != null)
+            mPresenter.detectParticipation(currentUser, roomModel);
+    }
+
+    @Override
+    public void onRoomEmpty() {
+        Log.d(TAG, "onRoomEmpty()");
+
+        mContext.runOnUiThread(this::displayPublicJoin);
+    }
+
+    @Override
+    public void onRoomJoinSaved(RoomModel roomModel) { currentRoomModel = roomModel;
+        Log.d(TAG, "onRoomJoinSaved()");
+    }
+
+    @Override
+    public void onRoomTakenSaved(ParticipantModel participantModel) { currentParticipantModel = participantModel;
+        Log.d(TAG, "onRoomTakenSaved()"); //mPresenter.saveCurrentParticipant(participantModel);
+
+        if(currentRoomModel != null) navigateToQuiz(currentRoomModel, participantModel);
+    }
+
+    @Override
+    public void onRoomExpired(RoomModel roomModel) { currentRoomModel = roomModel;
+        Log.d(TAG, "onRoomExpired");
+
+        Snackbar.make(rootView, "Successfully publish, share this room to participants by copy the room Id.", Snackbar.LENGTH_LONG).show();
+        ListObjects.fragmentManager(mContext).popBackStack();
+    }
+
+    @Override
+    public void onQuestionsLoaded(List<QuizModel> quizModelList) {
+        Log.d(TAG, "onRoomQuizLoaded");
+        mQuestionSize = quizModelList.size();
+
+        mContext.runOnUiThread(() -> { if (isStateByOwner)
+            displayOwnerList(quizModelList);
+        else {
+            setHeaderRoom(currentRoomModel);
+            displayPublicRoom(KEY_ROOM_CONTINUE);
+        }});
+    }
+
+    @Override
+    public void onQuestionsEmpty() {
+        Log.d(TAG, "onQuestionsEmpty");
+
+        mContext.runOnUiThread(() -> displayOwnerList(Collections.emptyList()));
+    }
+
+    private void copyRoomClipboard(View view) {
+        ClipboardManager clipboardManager = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("Room Id", currentRoomModel.getRoomId());
+        if(currentRoomModel != null) {
+            clipboardManager.setPrimaryClip(clipData);
+            Toast.makeText(mContext, "Room Id copied.", Toast.LENGTH_SHORT).show();
+        }else
+            Toast.makeText(mContext, "Invalid room Id.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onItemQuizSelected(QuizModel quizModel) {
+        Log.d(TAG, "onItemQuizSelected "+ quizModel.getQuizId());
+    }
+
+    @Override
+    public void onParticipationExist(ParticipantModel participantModels) { currentParticipantModel = participantModels;
+        Log.d(TAG, "onExistParticipation");
+
+        Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+
+        mContext.runOnUiThread(() -> {
+            setHeaderRoom(currentRoomModel);
+            displayPublicRoom(KEY_ROOM_CONTINUE);
+        });
+    }
+
+    @Override
+    public void onParticipationExpired() {
+        Log.d(TAG, "onExpiredParticipate");
+
+        Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
+
+        mContext.runOnUiThread(() -> {
+            setHeaderRoom(currentRoomModel);
+            displayPublicRoom(KEY_ROOM_FINISH);
+        });
+    }
+
+    @Override
+    public void onParticipantEmpty() {
+        Log.d(TAG, "onParticipantEmpty");
+
+        Snackbar.make(rootView, "Welcome to the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+
+        mContext.runOnUiThread(() -> {
+            setHeaderRoom(currentRoomModel);
+            displayPublicRoom(KEY_ROOM_GENERAL);
+        });
+    }
+
+
+    @Override
+    public void onError(Throwable t) {
+        Log.d(TAG, "Sorry, "+t.getLocalizedMessage());
+        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onProgressShow() {
+        Log.d(TAG, "onProgressShow()");
+    }
+
+    @Override
+    public void onProgressHide() {
+        Log.d(TAG, "onProgressHide()");
+
+    }
+
     private void initializeLayout(View rootView){
 
         contentInside = rootView.findViewById(R.id.contentInside);
@@ -241,7 +378,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
     private void publishQuiz(View view){
         if (currentRoomModel != null) {
-            currentRoomModel.setExpired(true);
+            currentRoomModel.setExpire(true);
             mPresenter.expireRoom(currentRoomModel);
         }else
             onError(new Throwable("Invalid current room."));
@@ -277,133 +414,6 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private void signOutOverRoom(View view) {
         mPresenter.removeCurrentRoom(currentRoomModel);
         displayPublicJoin();
-    }
-
-    @Override
-    public void onRoomRemoteLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
-        Log.d(TAG, "onRoomRemoteLoaded()");
-        mPresenter.saveCurrentRoom(roomModel);
-
-        if (currentUser != null)
-            mPresenter.detectParticipation(currentUser, roomModel);
-    }
-
-    @Override
-    public void onRoomLocalLoaded(RoomModel roomModel) { currentRoomModel = roomModel;
-        Log.d(TAG, "onRoomLocalLoaded()");
-
-        if (currentUser != null)
-            mPresenter.detectParticipation(currentUser, roomModel);
-    }
-
-    @Override
-    public void onRoomEmpty() {
-        Log.d(TAG, "onRoomEmpty()");
-
-        mContext.runOnUiThread(this::displayPublicJoin);
-    }
-
-    @Override
-    public void onRoomJoinSaved(RoomModel roomModel) { currentRoomModel = roomModel;
-        Log.d(TAG, "onRoomJoinSaved()");
-    }
-
-    @Override
-    public void onRoomTakenSaved(ParticipantModel participantModel) { currentParticipantModel = participantModel;
-        Log.d(TAG, "onRoomTakenSaved()"); //mPresenter.saveCurrentParticipant(participantModel);
-
-        if(currentRoomModel != null) navigateToQuiz(currentRoomModel, participantModel);
-    }
-
-    @Override
-    public void onRoomExpired(RoomModel roomModel) { currentRoomModel = roomModel;
-        Log.d(TAG, "onRoomExpired");
-
-        Snackbar.make(rootView, "Successfully publish, share this room to participants by copy the room Id.", Snackbar.LENGTH_LONG).show();
-        ListObjects.fragmentManager(mContext).popBackStack();
-    }
-
-    @Override
-    public void onQuestionsLoaded(List<QuizModel> quizModelList) {
-        Log.d(TAG, "onRoomQuizLoaded");
-        mQuestionSize = quizModelList.size();
-
-        if (isStateByOwner)
-            displayOwnerList(quizModelList);
-        else {
-            setHeaderRoom(currentRoomModel);
-            displayPublicRoom(KEY_ROOM_CONTINUE);
-        }
-    }
-
-    @Override
-    public void onQuestionsEmpty() {
-        Log.d(TAG, "onQuestionsEmpty");
-
-        displayOwnerList(Collections.emptyList());
-    }
-
-    private void copyRoomClipboard(View view) {
-        ClipboardManager clipboardManager = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clipData = ClipData.newPlainText("Room Id", currentRoomModel.getRoomId());
-        if(currentRoomModel != null) {
-            clipboardManager.setPrimaryClip(clipData);
-            Toast.makeText(mContext, "Room Id copied.", Toast.LENGTH_SHORT).show();
-        }else
-            Toast.makeText(mContext, "Invalid room Id.", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onItemQuizSelected(QuizModel quizModel) {
-        Log.d(TAG, "onItemQuizSelected "+ quizModel.getQuizId());
-    }
-
-    @Override
-    public void onParticipationExist(ParticipantModel participantModels) { currentParticipantModel = participantModels;
-        Log.d(TAG, "onExistParticipation");
-
-        Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
-
-        setHeaderRoom(currentRoomModel);
-        displayPublicRoom(KEY_ROOM_CONTINUE);
-    }
-
-    @Override
-    public void onParticipationExpired() {
-        Log.d(TAG, "onExpiredParticipate");
-
-        Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
-
-        setHeaderRoom(currentRoomModel);
-        displayPublicRoom(KEY_ROOM_FINISH);
-    }
-
-    @Override
-    public void onParticipantEmpty() {
-        Log.d(TAG, "onParticipantEmpty");
-
-        Snackbar.make(rootView, "Welcome to the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
-
-        setHeaderRoom(currentRoomModel);
-        displayPublicRoom(KEY_ROOM_GENERAL);
-    }
-
-
-    @Override
-    public void onError(Throwable t) {
-        Log.d(TAG, "Sorry, "+t.getLocalizedMessage());
-        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onProgressShow() {
-        Log.d(TAG, "onProgressShow()");
-    }
-
-    @Override
-    public void onProgressHide() {
-        Log.d(TAG, "onProgressHide()");
-
     }
 
     @Override

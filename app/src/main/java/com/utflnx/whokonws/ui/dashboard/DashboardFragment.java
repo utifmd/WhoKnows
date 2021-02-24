@@ -78,8 +78,12 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     @Override
     public void onSignedIn(UserModel currentUserModel) {
         Log.d(TAG, "onSignedIn()");
-        mPresenter.saveCurrentUser(currentUserModel);
-        mAuthenticationListener.onSignedIn(currentUserModel); //Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show(); // ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel); ListObjects.navigateTo(getContext(), fragment, false).commit();
+        try {
+            mPresenter.saveCurrentUser(currentUserModel);
+            mAuthenticationListener.onSignedIn(currentUserModel); //Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show(); // ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel); ListObjects.navigateTo(getContext(), fragment, false).commit();
+        }catch (Exception e){
+            onError(e);
+        }
     }
 
     @Override
@@ -90,32 +94,30 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     @Override
     public void onProfileSaved(UserModel userModel) {
         Log.d(TAG, "onProfileSaved()");
+        mContext.runOnUiThread(() -> {
+            if (textInputEmailIn.getEditText() != null && textInputPass.getEditText() != null){
+                displaySignInForm(rootView);
 
-        if (textInputEmailIn.getEditText() != null && textInputPass.getEditText() != null){
-            this.displaySignInForm(rootView);
+                textInputEmailIn.getEditText().setText(userModel.getEmail());
+                textInputPass.getEditText().setText(userModel.getPassword());
+            }
 
-            textInputEmailIn.getEditText().setText(userModel.getEmail());
-            textInputPass.getEditText().setText(userModel.getPassword());
-        }
-
-        Snackbar.make(rootView, "Successfully signed up as "+ userModel.getEmail()+", please login.", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(rootView, "Successfully signed up as "+ userModel.getEmail()+", please login.", Snackbar.LENGTH_SHORT).show();
+        });
     }
 
     @Override
     public void onProgressShow() {
         Log.d(TAG, "onProgress...");
-        mContext.runOnUiThread(() -> btnSubmit.setEnabled(false));
     }
 
     @Override
     public void onProgressHide() {
         Log.d(TAG, "onProgress done.");
-        mContext.runOnUiThread(() -> btnSubmit.setEnabled(true));
     }
 
     @Override
     public void onError(Throwable t) {
-        btnSubmit.setEnabled(true);
         Log.d(TAG, "Error "+t.getLocalizedMessage());
         Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
     }

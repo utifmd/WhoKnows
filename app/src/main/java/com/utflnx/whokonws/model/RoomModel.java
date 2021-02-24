@@ -3,6 +3,7 @@ package com.utflnx.whokonws.model;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import com.utflnx.whokonws.api.utils.ListObjects;
@@ -13,30 +14,22 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity(tableName = ListObjects.TABLE_CURRENT_ROOM)
-public class RoomModel implements Serializable {
+public class RoomModel extends UserModel implements Serializable {
 
-    @NonNull @PrimaryKey()
+    @ColumnInfo(name = "roomId")
     private String roomId;
 
     @ColumnInfo(name = "title")
     private String title;
 
-    @ColumnInfo(name = "userId")
-    private String userId;
-
     @ColumnInfo(name = "desc")
     private String desc;
 
     @ColumnInfo(name = "expired")
-    private int expired;
+    private String expired;
 
     @ColumnInfo(name = "minute")
     private String minute;
-
-    public RoomModel(){}
-    public RoomModel(@NotNull String roomId){
-        this.roomId = roomId;
-    }
 
     public String getRoomId() {
         return roomId;
@@ -54,14 +47,6 @@ public class RoomModel implements Serializable {
         this.title = title;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getDesc() {
         return desc;
     }
@@ -70,21 +55,21 @@ public class RoomModel implements Serializable {
         this.desc = desc;
     }
 
-    public int getExpired() {
+    public String getExpired() {
         return expired;
     }
 
-    public void setExpired(int expired) {
+    public void setExpired(String expired) {
         this.expired = expired;
     }
 
     public boolean isExpired() {
-        return expired == 1;
+        return expired.equals("1");
     }
 
-    public void setExpired(boolean expired) {
-        if (expired) this.expired = 1;
-        else  this.expired = 0;
+    public void setExpire(boolean expired) {
+        if (expired) this.expired = "1";
+        else  this.expired = "0";
     }
 
     public String getMinute() {
