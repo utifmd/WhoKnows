@@ -20,6 +20,7 @@ import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ResultModel;
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.repo.result.ResultRepository;
+import com.utflnx.whokonws.ui.MainPresenter;
 import com.utflnx.whokonws.ui.result.extension.ResultAdapter;
 
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
 public class ResultFragment extends Fragment implements ResultMainContract.View {
     private final String TAG = getClass().getSimpleName();
     private ResultMainContract.Presenter mPresenter;
+    private MainPresenter.ResultScopeListener.Callback resultCallback;
     private ResultRepository mResultRepository;
     private final static String KEY_RESULT_FRAGMENT = "KeyResultFragment";
     private View rootView, contentEmpty;
@@ -80,6 +82,11 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
         mRecyclerView.setHasFixedSize(true);
     }
 
+
+//    private void clearAllViews() {
+//        ListObjects.visibleGoneView(new View[]{}, contentJoin, cardRoom, contentPublicRoom, contentEmpty, contentList, recyclerView);
+//    }
+
     @Override
     public void onResultDisplay(List<ResultModel> resultModels) {
         Log.d(TAG, "onResultDisplay");
@@ -106,7 +113,7 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onError(Throwable t) {
         String message = "Sorry, "+t.getLocalizedMessage(); Log.d(TAG, message);
-        Snackbar.make(rootView, message, Snackbar.LENGTH_SHORT).show();
+        resultCallback.onNotify(message, Snackbar.LENGTH_LONG);
     }
 
     private void replaceWithList(List<ResultModel> resultModels) {
@@ -118,6 +125,10 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
 
     private void replaceWithEmpty() {
         ListObjects.visibleGoneView(new View[]{contentEmpty}, mRecyclerView);
+    }
+
+    public void setResultCallback(MainPresenter.ResultScopeListener.Callback resultCallback) {
+        this.resultCallback = resultCallback;
     }
 
     @Override
@@ -135,7 +146,19 @@ public class ResultFragment extends Fragment implements ResultMainContract.View 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mPresenter != null)
+        if (mPresenter != null) {
             mPresenter.destroy();
+        }
+        if(resultCallback != null){
+            resultCallback = null;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mPresenter != null) { Log.d(TAG, "onDetach");
+            mPresenter = null;
+        }
     }
 }

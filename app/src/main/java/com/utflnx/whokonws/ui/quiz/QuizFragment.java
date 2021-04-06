@@ -3,9 +3,7 @@ package com.utflnx.whokonws.ui.quiz;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -19,6 +17,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.utflnx.whokonws.MainActivity;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ParticipantModel;
@@ -29,17 +28,24 @@ import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.participant.ParticipateRepository;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
-import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
+import com.utflnx.whokonws.ui.MainPresenter;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 import static com.utflnx.whokonws.api.utils.ListObjects.KEY_CREATE_ROOM;
 import static com.utflnx.whokonws.api.utils.ListObjects.KEY_TAKE_ROOM;
 
-public class QuizFragment extends Fragment implements QuizMainContract.View {
+// TODO: 04/03/21
+/*
+1. issue on finish taken quiz should to ownRoom
+2. issue snack bar have to show in main_activity.xmllayout
+* */
+
+public class QuizFragment extends Fragment implements QuizMainContract.View{
     private final String TAG = getClass().getSimpleName();
     private final static String KEY_ROOM_FRAGMENT = "QuizRoomFragmentKey";
     private final static String KEY_PARTICIPANT_FRAGMENT = "QuizParticipantFragmentKey";
@@ -47,6 +53,7 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     private FragmentActivity mContext;
     private QuizMainContract.Presenter mPresenter;
     private QuizRepository mRepository;
+    private MainPresenter.QuizScopeListener.Callback mQuizCallback;
     private ParticipateRepository mParticipateRepository;
     private ProfileRepository mProfileRepository;
     private View rootView, contentCreate, contentTake;
@@ -59,23 +66,15 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     private UserModel currentUser = null;
     private RoomModel currentRoomModel = null;
     private ParticipantModel currentParticipantModel = null;
-    private List<QuizModel> currentQuizModelList = null;
+    private List<QuizModel> currentQuizModelList = new ArrayList<>();
     private String creatorSelectedAnswer;
     private int mViewType;
     private int viewPageSum = 0;
     private int viewPage = 0;
-    private List<String> correctAnswer = new ArrayList<>();
-    private List<String> wrongAnswer = new ArrayList<>();
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        mContext = (FragmentActivity) context;
-        mRepository = new QuizRepository(context);
-        mParticipateRepository = new ParticipateRepository(context);
-        mProfileRepository = new ProfileRepository(context);
-    }
+    private boolean isOptionsDecided = false;
+    private final ArrayList<String> correctAnswer = new ArrayList<>();
+    private final ArrayList<String> wrongAnswer = new ArrayList<>();
+    private HashMap<String, String> answers = new HashMap<>();
 
     public static QuizFragment createInstance(int key, RoomModel roomModel, ParticipantModel participantModel){
         QuizFragment fragment = new QuizFragment();
@@ -90,37 +89,38 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         return fragment;
     }
 
+    public QuizFragment(){
+        super(R.layout.fragment_quiz);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        mContext = (FragmentActivity) context;
+        mRepository = new QuizRepository(context);
+        mParticipateRepository = new ParticipateRepository(context);
+        mProfileRepository = new ProfileRepository(context);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         new QuizPresenter(this, mRepository, mParticipateRepository, mProfileRepository);
 
-        if (getArguments() != null) {
-            Serializable roomModel = getArguments().getSerializable(KEY_ROOM_FRAGMENT);
-            Serializable participantModel = getArguments().getSerializable(KEY_PARTICIPANT_FRAGMENT);
-
-            if (roomModel instanceof RoomModel){
-                currentRoomModel = (RoomModel) roomModel;
-            }
-
-            if (participantModel instanceof ParticipantModel){ Log.d(TAG, "participant called.");
-                currentParticipantModel = (ParticipantModel) participantModel;
-            }
-
-
-            mViewType = getArguments().getInt(KEY_TYPE_FRAGMENT);
-        }
+        currentRoomModel = (RoomModel) requireArguments().getSerializable(KEY_ROOM_FRAGMENT); // if (roomModel instanceof RoomModel)
+        currentParticipantModel = (ParticipantModel) requireArguments().getSerializable(KEY_PARTICIPANT_FRAGMENT);
+        mViewType = requireArguments().getInt(KEY_TYPE_FRAGMENT);
     }
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_quiz, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        rootView = view;
 
         initializeLayout(rootView);
         displayQuiz();
 
-        return rootView;
     }
 
     private void initializeLayout(View rootView) {
@@ -168,6 +168,8 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         if (currentRoomModel.getRoomId() != null) mPresenter.getRoomQuizList(currentRoomModel);
 
         recursiveCheckBoxes(0);
+        Log.d(TAG, "begin correctAnswer.size() "+correctAnswer.size());
+        Log.d(TAG, "begin wrong.size() "+wrongAnswer.size());
     }
 
     private void clearSetup(View view){
@@ -199,9 +201,9 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
                 mPresenter.createOwnerQuiz(mQuizModel);
             }else
-                Snackbar.make(rootView, R.string.form_cant_empty, Snackbar.LENGTH_SHORT).show();
+                mQuizCallback.onNotify(getString(R.string.form_cant_empty), Snackbar.LENGTH_SHORT);
         }else
-            Snackbar.make(rootView, "Invalid input, please check the answer", Snackbar.LENGTH_SHORT).show();
+            mQuizCallback.onNotify("Invalid input, please check the answer", Snackbar.LENGTH_SHORT);
     }
 
     private void setUpTakenQuiz(List<QuizModel> quizModelList) { Log.d(TAG, "setUpTakenQuiz: "+viewPage+"/"+viewPageSum);
@@ -214,17 +216,40 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
         if (viewPage != viewPageSum){
             btnNext.setOnClickListener(view -> {
-                try {
-                    viewPage++;
-                    recursiveCheckBoxes(0);
-                    setUpTakenQuiz(quizModelList);
-                } catch (Throwable t) {
-                    onError(t);
-                }
+                if (isOptionsDecided){
+                    try {
+                        viewPage++;
+                        isOptionsDecided = false;
+                        recursiveCheckBoxes(0);
+                        setUpTakenQuiz(quizModelList);
+                        decisionMaking();
+                    } catch (Throwable t) {
+                        onError(t);
+                    }
+                }else onError(new Throwable("Please select an answer of the quiz."));
             });
         }else {
             btnNext.setText(R.string.finish);
-            btnNext.setOnClickListener(view -> saveTakenQuiz());
+            btnNext.setOnClickListener(view -> {
+                if (isOptionsDecided) {
+                    try {
+                        decisionMaking();
+                        saveTakenQuiz();
+                    }catch (Exception e){
+                        onError(e);
+                    }
+                }
+                else onError(new Throwable("Please select an answer of the quiz."));
+            });
+        }
+    }
+
+    private void decisionMaking() {
+        if(answers.get("correct") != null) { Log.d(TAG, "add correct answer");
+            correctAnswer.add(answers.get("correct"));
+        }
+        if(answers.get("wrong") != null) { Log.d(TAG, "add wrong answer");
+            wrongAnswer.add(answers.get("wrong"));
         }
     }
 
@@ -234,14 +259,18 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
 
         for (int i = 0; i < mCheckBoxes.length; i++) {
             int index = i;
-            mCheckBoxes[i].setChecked(mCheckBoxes[i] == mCheckBoxes[checked]);
+            if (isOptionsDecided) mCheckBoxes[i].setChecked(mCheckBoxes[i] == mCheckBoxes[checked]);
+            else mCheckBoxes[i].setChecked(false);
 
-            mCheckBoxes[i].setOnClickListener(view -> {
+            mCheckBoxes[i].setOnClickListener(view -> { isOptionsDecided = true;
                 recursiveCheckBoxes(index);
-                if (currentQuizModelList.get(viewPage).getAnswer().equals(options[index]))
-                    correctAnswer.add(currentQuizModelList.get(viewPage).getQuestion()); // Log.d(TAG, options[index]+" is correct answer");
-                else wrongAnswer.add(currentQuizModelList.get(viewPage).getQuestion()); // Log.d(TAG, options[index]+" is wrong answer");
-
+                if (currentQuizModelList.get(viewPage).getAnswer().equals(options[index])) {
+                    answers.clear();
+                    answers.put("correct", currentQuizModelList.get(viewPage).getQuestion()+" = [correct] "+options[index]);
+                }else {
+                    answers.clear();
+                    answers.put("wrong", currentQuizModelList.get(viewPage).getQuestion()+" = [wrong] "+options[index]);
+                }
             });
         }
     }
@@ -251,13 +280,14 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
             ResultModel resultModel = new ResultModel();
             resultModel.setResultId(UUID.randomUUID().toString());
             resultModel.setRoomId(currentParticipantModel.getRoomId());
-            resultModel.setUserId(currentParticipantModel.getUserId());
+            resultModel.setUserId(currentUser.getUserId());
             resultModel.setUserName(currentUser.getFullName());
             resultModel.setCorrectQuiz(correctAnswer.toString());
             resultModel.setWrongQuiz(wrongAnswer.toString());
             resultModel.setScore(correctAnswer.size()+" * 10 / "+currentQuizModelList.size()+ " = "+ correctAnswer.size() * 10 / currentQuizModelList.size());
 
-            mPresenter.expireParticipant(currentParticipantModel, resultModel); //clearSetup(view);
+            Log.d(TAG, resultModel.toString());
+            // mPresenter.expireParticipant(currentParticipantModel, resultModel); //clearSetup(view);
 
         }else onError(new Throwable("Current data is not available."));
     }
@@ -297,17 +327,17 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
     }
 
     @Override
-    public void onExpiredParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel) { // participant already updated.
+    public void onFinishParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel) { // participant already updated.
         Log.d(TAG, "onFinishParticipantTakenQuiz");
 
-        ListObjects.fragmentManager(mContext).popBackStack();
-        //RoomOwnerFragment fragment = RoomOwnerFragment.createInstance(currentUser); ListObjects.navigateTo(mContext, fragment, false).commit();
+        mQuizCallback.onDisplaySingleTab(MainActivity.STATE_OWNER_ROOM, currentUser);
+        mQuizCallback.onNotify("Thank you for your participation "+currentUser.getFullName()+"!, hope you enjoy the quiz :)", Snackbar.LENGTH_LONG);
     }
 
     @Override
     public void onError(Throwable t) {
         Log.d(TAG, "onError "+ t.getLocalizedMessage());
-        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_SHORT).show();
+        mQuizCallback.onNotify("Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG);
     }
 
     @Override
@@ -334,6 +364,13 @@ public class QuizFragment extends Fragment implements QuizMainContract.View {
         if (mPresenter != null){
             mPresenter.destroy();
         }
+        if (mQuizCallback != null){
+            mQuizCallback = null;
+        }
+    }
+
+    public void setQuizCallback(MainPresenter.QuizScopeListener.Callback quizCallback) {
+        mQuizCallback = quizCallback;
     }
 
     @Override

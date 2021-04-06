@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -13,16 +13,10 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar_fragment"
-            app:menu="@menu/menu_owner_room"
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            android:elevation="3dp"
-            android:layout_height="40dp"/> <!--?attr/actionBarSize-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/mRecyclerView"
+            android:layout_margin="4dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar_fragment" />

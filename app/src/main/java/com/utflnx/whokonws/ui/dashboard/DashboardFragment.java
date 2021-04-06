@@ -16,12 +16,11 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
-import com.utflnx.whokonws.MainActivity;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
-import com.utflnx.whokonws.ui.AuthenticationListener;
+import com.utflnx.whokonws.ui.MainPresenter;
 import com.utflnx.whokonws.ui.explore.ExploreFragment;
 
 import java.util.UUID;
@@ -30,6 +29,7 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     private final String TAG = getClass().getSimpleName();
     private FragmentActivity mContext;
     private DashboardContract.Presenter mPresenter;
+    private MainPresenter.DashScopeListener.Callback dashCallback;
     private ProfileRepository profileRepository;
 
     private View rootView, contentSignIn, contentRegister, btnCloseContent, btnFooter;
@@ -40,15 +40,10 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     private final int VIEW_TYPE_SIGN_IN = 1;
     private final int VIEW_TYPE_REGISTER = 2;
 
-    private AuthenticationListener mAuthenticationListener;
+    private MainPresenter.AuthenticationListener mAuthenticationListener;
 
-    public void setAuthListener(AuthenticationListener authListener){
-        this.mAuthenticationListener = authListener;
-    }
-
-    @Override
-    public void setPresenter(DashboardContract.Presenter presenter) {
-        mPresenter = presenter;
+    public DashboardFragment(){
+        super(R.layout.fragment_dashboard);
     }
 
     @Override
@@ -62,17 +57,17 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ListObjects.handleOnBackPressed(mContext, this); //6601b4b4-629a-4445-bd29-33ae47fd2679
+
         new DashboardPresenter(this, profileRepository);
     }
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_dashboard, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        rootView = view;
 
         initializeLayout(rootView);
         updateStateLayout(VIEW_TYPE_GENERAL);
-
-        return rootView;
     }
 
     @Override
@@ -80,7 +75,7 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
         Log.d(TAG, "onSignedIn()");
         try {
             mPresenter.saveCurrentUser(currentUserModel);
-            mAuthenticationListener.onSignedIn(currentUserModel); //Snackbar.make(rootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show(); // ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel); ListObjects.navigateTo(getContext(), fragment, false).commit();
+            mAuthenticationListener.onSignedIn(currentUserModel); //dashCallback.onNotify(ootView, "Successfully sign in as "+ currentUserModel.getFullName(), Snackbar.LENGTH_LONG).show(); // ProfileFragment fragment = ProfileFragment.createInstance(currentUserModel); ListObjects.navigateTo(getContext(), fragment,;
         }catch (Exception e){
             onError(e);
         }
@@ -102,7 +97,7 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
                 textInputPass.getEditText().setText(userModel.getPassword());
             }
 
-            Snackbar.make(rootView, "Successfully signed up as "+ userModel.getEmail()+", please login.", Snackbar.LENGTH_SHORT).show();
+            dashCallback.onNotify( "Successfully signed up as "+ userModel.getEmail()+", please login.", Snackbar.LENGTH_SHORT);
         });
     }
 
@@ -119,7 +114,7 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
     @Override
     public void onError(Throwable t) {
         Log.d(TAG, "Error "+t.getLocalizedMessage());
-        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+        dashCallback.onNotify( "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG);
     }
 
     void updateStateLayout(int STATE){
@@ -137,7 +132,7 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
 
         btnFooter.setOnClickListener(this::displayRegisterForm);
         btnCloseContent.setOnClickListener(this::displayGeneral);
-        btnExplore.setOnClickListener(viewSubmit -> ListObjects.navigateTo(getContext(), new ExploreFragment(), true).commit());
+        btnExplore.setOnClickListener(viewSubmit -> ListObjects.navigateTo(getContext(), new ExploreFragment()).addToBackStack(null).commit());
     }
 
     private void signIn(View view) {
@@ -152,9 +147,9 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
 
                 mPresenter.signIn(userModel);
             }else
-                Snackbar.make(rootView, "Email or password can't be empty!", Snackbar.LENGTH_LONG).show();
+                dashCallback.onNotify( "Email or password can't be empty!", Snackbar.LENGTH_LONG);
         }else
-            Snackbar.make(rootView, "Invalid input system error.", Snackbar.LENGTH_LONG).show();
+            dashCallback.onNotify( "Invalid input system error.", Snackbar.LENGTH_LONG);
     }
 
     private void signUp(View view) {
@@ -178,11 +173,11 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
 
                     mPresenter.signUp(userModel);
                 }else
-                    Snackbar.make(rootView, "Sorry password does'nt match!", Snackbar.LENGTH_LONG).show();
+                    dashCallback.onNotify("Sorry password does'nt match!", Snackbar.LENGTH_LONG);
             }else
-                Snackbar.make(rootView, R.string.form_cant_empty , Snackbar.LENGTH_LONG).show();
+                dashCallback.onNotify(getString(R.string.form_cant_empty) , Snackbar.LENGTH_LONG);
         }else
-            Snackbar.make(rootView, R.string.invalid_input, Snackbar.LENGTH_LONG).show();
+            dashCallback.onNotify(getString(R.string.invalid_input), Snackbar.LENGTH_LONG);
     }
 
     private void displayGeneral(View view) {
@@ -222,6 +217,19 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
         btnCloseContent = rootView.findViewById(R.id.btn_close_content);
     }
 
+    public void setAuthListener(MainPresenter.AuthenticationListener authListener){
+        this.mAuthenticationListener = authListener;
+    }
+
+    public void setDashCallback(MainPresenter.DashScopeListener.Callback dashCallback) {
+        this.dashCallback = dashCallback;
+    }
+
+    @Override
+    public void setPresenter(DashboardContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -236,5 +244,17 @@ public class DashboardFragment extends Fragment implements DashboardContract.Vie
         if(mPresenter != null){
             mPresenter.destroy();
         }
+        if (dashCallback != null){
+            dashCallback = null;
+        }
     }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mPresenter != null) { Log.d(TAG, "onDetach");
+            mPresenter = null;
+        }
+    }
+
 }

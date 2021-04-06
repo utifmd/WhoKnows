@@ -17,7 +17,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class RoomRemote implements RoomDataContract{
+public class RoomRemote implements RoomDataContract.RemoteListener{
     private final RemoteService remoteService;
 
     public RoomRemote(Context context) {
@@ -25,7 +25,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void getOwnerRoom(UserModel currentUserModel, LoadedRoomListCallback callback) {
+    public void getOwnerRoom(UserModel currentUserModel, RoomDataContract.LoadedRoomListCallback callback) {
         HashMap<String, String> container = new HashMap<>();
         container.put("userId", currentUserModel.getUserId());
 
@@ -48,7 +48,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void postOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) {
+    public void postOwnerRoom(RoomModel roomModel, RoomDataContract.ActionRoomCallBack callBack) {
         APIRequestModel APIRequestModel = RemoteModule.passingRequestModel(ListObjects.ABOUT_POST_ONLY, new String[]{ListObjects.TABLE_ROOM}, roomModel, null, null);
 
         remoteService.postOwnerRoom(APIRequestModel).enqueue(new Callback<String>() {
@@ -67,7 +67,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void deleteOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) {
+    public void deleteOwnerRoom(RoomModel roomModel, RoomDataContract.ActionRoomCallBack callBack) {
         HashMap<String, String> container = new HashMap<>();
         container.put("roomId", roomModel.getRoomId());
 
@@ -95,7 +95,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void getRemoteRoom(String roomId, LoadedRoomCallback callBack) {
+    public void getRemoteRoom(String roomId, RoomDataContract.LoadedRoomCallback callBack) {
         HashMap<String, String> container = new HashMap<>();
         container.put("roomId", roomId);
 
@@ -119,13 +119,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void getLocalRoom(LoadedRoomCallback callBack) {}
-
-    @Override
-    public void postLocalRoom(RoomModel roomModel) {}
-
-    @Override
-    public void postPublicParticipant(ParticipantModel participantModel, ActionParticipantCallBack participantCallBack) {
+    public void postPublicParticipant(ParticipantModel participantModel, RoomDataContract.ActionParticipantCallBack participantCallBack) {
         APIRequestModel apiRequestModel = RemoteModule.passingRequestModel(
                 ListObjects.ABOUT_POST_ONLY,
                 new String[]{ListObjects.TABLE_PARTICIPANT},
@@ -149,7 +143,7 @@ public class RoomRemote implements RoomDataContract{
     }
 
     @Override
-    public void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack) {
+    public void updateCurrentRoom(RoomModel currentRoom, RoomDataContract.ActionRoomCallBack roomCallBack) {
         APIRequestModel requestModel = RemoteModule.passingRequestModel(
                 ListObjects.ABOUT_UPDATE_ONLY, new String[]{ListObjects.TABLE_ROOM}, currentRoom, null, "roomId = '"+currentRoom.getRoomId()+"'");
 

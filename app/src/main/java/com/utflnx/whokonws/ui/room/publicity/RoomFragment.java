@@ -5,14 +5,13 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.utflnx.whokonws.MainActivity;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ParticipantModel;
@@ -33,6 +33,7 @@ import com.utflnx.whokonws.repo.participant.ParticipateRepository;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.repo.room.RoomRepository;
+import com.utflnx.whokonws.ui.MainPresenter;
 import com.utflnx.whokonws.ui.quiz.QuizFragment;
 import com.utflnx.whokonws.ui.result.ResultFragment;
 import com.utflnx.whokonws.ui.room.publicity.extension.RoomAdapter;
@@ -41,17 +42,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class RoomFragment extends Fragment implements RoomMainContract.View {
+public class RoomFragment extends Fragment implements RoomMainContract.View, MainPresenter.QuizScopeListener.Callback {
     private final String TAG = getClass().getSimpleName();
     private final static String KEY_FRAGMENT = "RoomFragmentKey";
     private final static String KEY_IS_STATE_BY_OWNER = "IsStateByOwner";
     private RoomMainContract.Presenter mPresenter;
+    private MainPresenter.RoomScopeListener.Callback roomCallback;
     private RoomRepository roomRepository;
     private ProfileRepository profileRepository;
     private QuizRepository quizRepository;
     private ParticipateRepository participateRepository;
     private FragmentActivity mContext;
-    private View rootView, contentPublicRoom, contentInside, contentJoin, contentList, btnCloseContent, contentEmpty, btnCopyRoomId;
+    private View rootView, contentPublicRoom, contentInside, contentJoin, contentList, btnCloseContent, contentEmpty, btnCopyRoomId;//, rootView;
     private TextInputLayout inpRoomId;
     private TextView roomTitle, roomDesc, roomTime;
     private MaterialCardView cardRoom;
@@ -70,6 +72,22 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     private final int KEY_ROOM_CONTINUE = 1;
     private final int KEY_ROOM_FINISH = 2;
 
+    public static RoomFragment createInstance(UserModel currentUser, RoomModel roomModel, boolean ownRoom){
+        RoomFragment roomFragment = new RoomFragment();
+        Bundle bundle = new Bundle();
+
+        bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
+        bundle.putSerializable(KEY_FRAGMENT, roomModel);
+        bundle.putBoolean(KEY_IS_STATE_BY_OWNER, ownRoom);
+
+        roomFragment.setArguments(bundle);
+        return roomFragment;
+    }
+
+    public RoomFragment(){
+        super(R.layout.fragment_room);
+    }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -82,41 +100,30 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         roomAdapter = new RoomAdapter(context);
     }
 
-    public static RoomFragment createInstance(UserModel currentUser, RoomModel roomModel, boolean isByOwner){
-        RoomFragment roomFragment = new RoomFragment();
-        Bundle bundle = new Bundle();
-
-        bundle.putSerializable(ListObjects.KEY_CURRENT_USER, currentUser);
-        bundle.putSerializable(KEY_FRAGMENT, roomModel);
-        bundle.putBoolean(KEY_IS_STATE_BY_OWNER, isByOwner);
-
-        roomFragment.setArguments(bundle);
-        return roomFragment;
-    }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            currentUser = (UserModel) getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
-            currentRoomModel = (RoomModel) getArguments().getSerializable(KEY_FRAGMENT);
-            isStateByOwner = getArguments().getBoolean(KEY_IS_STATE_BY_OWNER);
-        }
+        currentUser = (UserModel) requireArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
+        currentRoomModel = (RoomModel) requireArguments().getSerializable(KEY_FRAGMENT);
+        isStateByOwner = requireArguments().getBoolean(KEY_IS_STATE_BY_OWNER);
 
-        Log.d(TAG, "onCreate user: "+currentUser.getEmail());
+        mContext.getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                popToOwnerRoom(rootView);
+            }
+        });
 
         new RoomPresenter(this, roomRepository, profileRepository, quizRepository, participateRepository);
     }
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_room, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        rootView = view;
 
-        initializeLayout(rootView);
+        initializeLayout(view);
         displayRoom();
-
-        return rootView;
     }
 
     @Override
@@ -127,6 +134,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
             if (currentUser != null)
                 mPresenter.detectParticipation(currentUser, roomModel);
+            else throw new IllegalArgumentException("CurrentUser Invalid");
         }catch (Exception e){
             onError(e);
         }
@@ -138,6 +146,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
 
         if (currentUser != null)
             mPresenter.detectParticipation(currentUser, roomModel);
+        else onError(new Throwable("CurrentUser invalid"));
     }
 
     @Override
@@ -163,8 +172,9 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onRoomExpired(RoomModel roomModel) { currentRoomModel = roomModel;
         Log.d(TAG, "onRoomExpired");
 
-        Snackbar.make(rootView, "Successfully publish, share this room to participants by copy the room Id.", Snackbar.LENGTH_LONG).show();
-        ListObjects.fragmentManager(mContext).popBackStack();
+        roomCallback.onNotify("Successfully publish, share this room to participants by copy the room Id.", Snackbar.LENGTH_LONG);
+
+        popToOwnerRoom(rootView);
     }
 
     @Override
@@ -175,8 +185,9 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         mContext.runOnUiThread(() -> { if (isStateByOwner)
             displayOwnerList(quizModelList);
         else {
-            setHeaderRoom(currentRoomModel);
+
             displayPublicRoom(KEY_ROOM_CONTINUE);
+            setHeaderRoom(currentRoomModel);
         }});
     }
 
@@ -192,9 +203,9 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         ClipData clipData = ClipData.newPlainText("Room Id", currentRoomModel.getRoomId());
         if(currentRoomModel != null) {
             clipboardManager.setPrimaryClip(clipData);
-            Toast.makeText(mContext, "Room Id copied.", Toast.LENGTH_SHORT).show();
+            roomCallback.onNotify("Room id copied.", Snackbar.LENGTH_SHORT);
         }else
-            Toast.makeText(mContext, "Invalid room Id.", Toast.LENGTH_SHORT).show();
+            roomCallback.onNotify("Invalid room id.", Snackbar.LENGTH_SHORT);
     }
 
     @Override
@@ -206,7 +217,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onParticipationExist(ParticipantModel participantModels) { currentParticipantModel = participantModels;
         Log.d(TAG, "onExistParticipation");
 
-        Snackbar.make(rootView, "You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+        roomCallback.onNotify("You already joined the room, please finish the quiz!", Snackbar.LENGTH_LONG);
 
         mContext.runOnUiThread(() -> {
             setHeaderRoom(currentRoomModel);
@@ -218,7 +229,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onParticipationExpired() {
         Log.d(TAG, "onExpiredParticipate");
 
-        Snackbar.make(rootView, "Thank's for your participation!", Snackbar.LENGTH_LONG).show();
+        roomCallback.onNotify("Thank's for your participation!", Snackbar.LENGTH_SHORT);
 
         mContext.runOnUiThread(() -> {
             setHeaderRoom(currentRoomModel);
@@ -230,7 +241,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     public void onParticipantEmpty() {
         Log.d(TAG, "onParticipantEmpty");
 
-        Snackbar.make(rootView, "Welcome to the room, please finish the quiz!", Snackbar.LENGTH_LONG).show();
+        roomCallback.onNotify("Welcome to the room, please finish the quiz!", Snackbar.LENGTH_SHORT);
 
         mContext.runOnUiThread(() -> {
             setHeaderRoom(currentRoomModel);
@@ -242,7 +253,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     @Override
     public void onError(Throwable t) {
         Log.d(TAG, "Sorry, "+t.getLocalizedMessage());
-        Snackbar.make(rootView, "Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG).show();
+        roomCallback.onNotify("Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG);
     }
 
     @Override
@@ -253,11 +264,9 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     @Override
     public void onProgressHide() {
         Log.d(TAG, "onProgressHide()");
-
     }
 
     private void initializeLayout(View rootView){
-
         contentInside = rootView.findViewById(R.id.contentInside);
         contentJoin = rootView.findViewById(R.id.contentJoin);
         cardRoom = rootView.findViewById(R.id.card_room);
@@ -276,9 +285,12 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
         btnCopyRoomId = rootView.findViewById(R.id.btn_copy_room_id);
         btnTakeRoom = rootView.findViewById(R.id.btn_take_room);
         inpRoomId = rootView.findViewById(R.id.text_input_room_id);
-
         recyclerView = rootView.findViewById(R.id.mRecyclerView);
+    }
 
+    private void popToOwnerRoom(View view) {
+        roomCallback.onInvalidateToolbar(MainActivity.STATE_OWNER_ROOM);
+        ListObjects.fragmentManager(mContext).popBackStack();
     }
 
     private void displayRoom(){
@@ -295,9 +307,9 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
             if (!etRoomId.getText().toString().trim().isEmpty())
                 mPresenter.joinRoom(etRoomId.getText().toString().trim());
             else
-                Snackbar.make(rootView, R.string.form_cant_empty, Snackbar.LENGTH_SHORT).show();
+                roomCallback.onNotify(getString(R.string.form_cant_empty), Snackbar.LENGTH_SHORT);
         }else
-            Snackbar.make(rootView, R.string.invalid_input, Snackbar.LENGTH_SHORT).show();
+            roomCallback.onNotify(getString(R.string.invalid_input), Snackbar.LENGTH_SHORT);
     }
 
     private void setHeaderRoom(RoomModel roomModel) {
@@ -372,21 +384,23 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     private void createQuiz(View view) {
-        Fragment fragment = QuizFragment.createInstance(ListObjects.KEY_CREATE_ROOM, currentRoomModel, null);
-        ListObjects.navigateTo(mContext, fragment, true).commit();
+        QuizFragment fragment = QuizFragment.createInstance(ListObjects.KEY_CREATE_ROOM, currentRoomModel, null);
+        fragment.setQuizCallback(this);
+        ListObjects.navigateTo(mContext, fragment).addToBackStack(null).commit();
     }
 
     private void publishQuiz(View view){
         if (currentRoomModel != null) {
-            currentRoomModel.setExpire(true);
-            mPresenter.expireRoom(currentRoomModel);
-        }else
-            onError(new Throwable("Invalid current room."));
+            if (mQuestionSize >= 2) {
+                currentRoomModel.setExpire(true);
+                mPresenter.expireRoom(currentRoomModel);
+            } else onError(new Throwable("The room at least has 2 questions."));
+        }else onError(new Throwable("Invalid current room."));
     }
 
     private void resultQuiz(RoomModel roomModel) {
         Fragment fragment = ResultFragment.createInstance(roomModel);
-        ListObjects.navigateTo(mContext, fragment, true).commit();
+        ListObjects.navigateTo(mContext, fragment).addToBackStack(null).commit();
     }
 
     private void takeTheRoom(View view) {
@@ -394,7 +408,7 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
             ParticipantModel model = new ParticipantModel();
             model.setParticipantId(UUID.randomUUID().toString());
             model.setRoomId(currentRoomModel.getRoomId());
-            model.setUserId(currentRoomModel.getUserId());
+            model.setUserId(currentUser.getUserId());
             model.setTotalQuiz(mQuestionSize);
             model.setCurrentPage(0);
             model.setTotalTime(Integer.parseInt(currentRoomModel.getMinute()));
@@ -407,13 +421,18 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     private void navigateToQuiz(RoomModel roomModel, ParticipantModel participantModel){
-        Fragment fragment = QuizFragment.createInstance(ListObjects.KEY_TAKE_ROOM, roomModel, participantModel);
-        ListObjects.navigateTo(mContext, fragment, true).commit();
+        QuizFragment fragment = QuizFragment.createInstance(ListObjects.KEY_TAKE_ROOM, roomModel, participantModel);
+        fragment.setQuizCallback(this);
+        ListObjects.navigateTo(mContext, fragment).addToBackStack(null).commit();
     }
 
     private void signOutOverRoom(View view) {
         mPresenter.removeCurrentRoom(currentRoomModel);
         displayPublicJoin();
+    }
+
+    public void setRoomCallback(MainPresenter.RoomScopeListener.Callback callback){
+        roomCallback = callback;
     }
 
     @Override
@@ -431,11 +450,36 @@ public class RoomFragment extends Fragment implements RoomMainContract.View {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy() { Log.d(TAG, "onDestroy");
         super.onDestroy();
-
-        if (mPresenter != null){
+        if(mPresenter != null){ Log.d(TAG, "mPresenter not null");
             mPresenter.destroy();
         }
+        if(rootView != null){ Log.d(TAG, "rootView not null");
+            rootView = null;
+        }
+        if (roomCallback != null){
+            roomCallback = null;
+        }
+    }
+
+    @Override
+    public void onDisplaySingleTab(int stateOfTab, UserModel currentUser) {
+        roomCallback.onDisplaySingleTab(stateOfTab, currentUser);
+    }
+
+    @Override
+    public void onInvalidateToolbar(int stated) {
+        roomCallback.onInvalidateToolbar(stated);
+    }
+
+    @Override
+    public void onInactivateToolbar() {
+        roomCallback.onInactivateToolbar();
+    }
+
+    @Override
+    public void onNotify(String message, int duration) {
+        roomCallback.onNotify(message, duration);
     }
 }

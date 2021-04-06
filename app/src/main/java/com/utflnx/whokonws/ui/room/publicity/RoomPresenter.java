@@ -19,14 +19,14 @@ import java.util.List;
 
 public class RoomPresenter implements RoomMainContract.Presenter {
     private final String TAG = getClass().getSimpleName();
-    private RoomMainContract.View mView;
+    private RoomMainContract.View mView = null;
     private final RoomRepository mRepository;
     private final ProfileRepository mProfileRepository;
     private final QuizRepository mQuizRepository;
     private final ParticipateRepository mParticipateRepository;
 
-    public RoomPresenter(RoomMainContract.View mView, RoomRepository repository, ProfileRepository profileRepository, QuizRepository quizRepository, ParticipateRepository participateRepository) {
-        this.mView = mView;
+    public RoomPresenter(RoomMainContract.View view, RoomRepository repository, ProfileRepository profileRepository, QuizRepository quizRepository, ParticipateRepository participateRepository) {
+        this.mView = view;
         this.mRepository = repository;
         this.mProfileRepository = profileRepository;
         this.mQuizRepository = quizRepository;
@@ -37,6 +37,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void joinRoom(String roomId) {
+        if (mView == null) return;
+
         mView.onProgressShow();
         mRepository.getRemoteRoom(roomId, new RoomDataContract.LoadedRoomCallback() {
             @Override
@@ -60,6 +62,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void takingRoom(ParticipantModel participantModel) {
+        if (mView == null) return;
+
         mView.onProgressShow();
         mRepository.postPublicParticipant(participantModel, new RoomDataContract.ActionParticipantCallBack() {
             @Override
@@ -78,6 +82,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void expireRoom(RoomModel currentRoom) {
+        if (mView == null) return;
+
         mView.onProgressShow();
         mRepository.updateCurrentRoom(currentRoom, new RoomDataContract.ActionRoomCallBack() {
             @Override
@@ -95,6 +101,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
     }
 
     private void filterOnlyCompleteRoom(RoomModel roomModel) {
+        if (mView == null) return;
+
         mQuizRepository.getRoomQuizList(roomModel, new QuizDataContract.LoadedQuizCallback() {
             @Override
             public void onQuizListLoaded(List<QuizModel> quizModelList) {
@@ -118,16 +126,22 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void saveCurrentRoom(RoomModel roomModel) {
+        if (mView == null) return;
+
         mRepository.postLocalRoom(roomModel);
     }
 
     @Override
     public void removeCurrentRoom(RoomModel roomModel) {
+        if (mView == null) return;
+
         mQuizRepository.deleteQuizLocal();
     }
 
     @Override
     public void displayCurrentRoom() {
+        if (mView == null) return;
+
         mView.onProgressShow();
         mRepository.getLocalRoom(new RoomDataContract.LoadedRoomCallback() {
             @Override
@@ -152,6 +166,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void detectParticipation(UserModel currentUser, RoomModel roomModel) {
+        if (mView == null) return;
+
         mParticipateRepository.getCurrentParticipate(currentUser, roomModel, new ParticipantDataContract.LoadedParticipantCallback() {
             @Override
             public void onParticipateExist(ParticipantModel participantModels) {
@@ -181,6 +197,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void displayRoomQuizList(RoomModel roomModel) {
+        if (mView == null) return;
+
         mView.onProgressShow();
         mQuizRepository.getRoomQuizList(roomModel, new QuizDataContract.LoadedQuizCallback() {
             @Override
@@ -206,6 +224,8 @@ public class RoomPresenter implements RoomMainContract.Presenter {
 
     @Override
     public void selectItemQuiz(QuizModel quizModel) {
+        if (mView == null) return;
+
         mView.onItemQuizSelected(quizModel);
     }
 

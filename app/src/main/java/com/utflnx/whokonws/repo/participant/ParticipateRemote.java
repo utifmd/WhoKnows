@@ -31,8 +31,8 @@ public class ParticipateRemote implements ParticipantDataContract {
     @Override
     public void getCurrentParticipate(UserModel currentUser, RoomModel roomModel, LoadedParticipantCallback participantCallback) {
         LinkedHashMap<String, String> container = new LinkedHashMap<>();
-        container.put("userId", currentUser.getUserId());
         container.put("roomId", roomModel.getRoomId());
+        container.put("userId", currentUser.getUserId());
 /*
 * $fetchCoupleBy = '{
     "about": "fetch_couple_by",

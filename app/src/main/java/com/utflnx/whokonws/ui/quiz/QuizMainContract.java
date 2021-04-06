@@ -26,7 +26,7 @@ public interface QuizMainContract {
         void onQuizDisplay();
         void onQuizEmpty();
         void onOwnerQuizRemoteSaved(QuizModel quizModel);
-        void onExpiredParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel);
+        void onFinishParticipantTakenQuiz(ParticipantModel participantModel, ResultModel resultModel);
         void onError(Throwable t);
         void onProgressShow();
         void onProgressHide();

@@ -9,24 +9,27 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
-import com.utflnx.whokonws.ui.AuthenticationListener;
-import com.utflnx.whokonws.ui.dashboard.DashboardFragment;
+import com.utflnx.whokonws.ui.MainPresenter;
 import com.utflnx.whokonws.ui.room.ownership.RoomOwnerFragment;
 
 public class ProfileFragment extends Fragment implements ProfileMainContract.View {
     private final String TAG = getClass().getSimpleName();
     private FragmentActivity mContext;
     private ProfileMainContract.Presenter mPresenter;
+    private MainPresenter.ProfileScopeListener.Callback profileCallback;
     private ProfileRepository mRepository;
     private QuizRepository quizRepository;
     private View rootView;
@@ -35,16 +38,7 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     private Button btnSignOut;
     private TextView tvFullName, tvPhone, tvMail;
 
-    private AuthenticationListener mAuthenticationListener;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        mContext = (FragmentActivity) context;
-        mRepository = new ProfileRepository(context); // mCurrentUser = new User();
-        quizRepository = new QuizRepository(context);
-    }
+    private MainPresenter.AuthenticationListener mAuthenticationListener;
 
     public static ProfileFragment createInstance(UserModel currentUser){
         ProfileFragment fragment = new ProfileFragment();
@@ -55,24 +49,35 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
         return fragment;
     }
 
+    public ProfileFragment() {
+        super(R.layout.fragment_profile);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        mContext = (FragmentActivity) context;
+        mRepository = new ProfileRepository(context); // mCurrentUser = new User();
+        quizRepository = new QuizRepository(context);
+
+        ListObjects.handleOnBackPressed(mContext, this);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null)
-            currentUser = (UserModel)getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
-
         new ProfilePresenter(this, mRepository, quizRepository);
     }
 
-    @Nullable @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_profile, container, false);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        currentUser = (UserModel) requireArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
+        rootView = view;
 
         initializeLayout();
         updateStateLayout(currentUser);
-
-        return rootView;
     }
 
     private void initializeLayout() {
@@ -93,7 +98,7 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     private void ownerRoom(View view) {
         RoomOwnerFragment fragment = RoomOwnerFragment.createInstance(currentUser);
 
-        ListObjects.navigateTo(mContext, fragment, true).commit();
+        ListObjects.navigateTo(mContext, fragment).commit();
     }
 
     private void signOut(View view) {
@@ -129,7 +134,8 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
 
     @Override
     public void onError(Throwable t) {
-        Log.d(TAG, "onError()");
+        Log.d(TAG, "Sorry, "+t.getLocalizedMessage());
+        profileCallback.onNotify("Sorry, "+t.getLocalizedMessage(), Snackbar.LENGTH_LONG);
     }
 
     @Override
@@ -142,12 +148,16 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
         Log.d(TAG, "onProgress done.");
     }
 
+    public void setProfileCallback(MainPresenter.ProfileScopeListener.Callback callback) {
+        profileCallback = callback;
+    }
+
     @Override
     public void setPresenter(ProfileMainContract.Presenter presenter) {
         mPresenter = presenter;
     }
 
-    public void setAuthenticationListener(AuthenticationListener authListener){
+    public void setAuthenticationListener(MainPresenter.AuthenticationListener authListener){
         this.mAuthenticationListener = authListener;
     }
 
@@ -160,10 +170,16 @@ public class ProfileFragment extends Fragment implements ProfileMainContract.Vie
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy() { Log.d(TAG, "onDestroy");
         super.onDestroy();
         if(mPresenter != null){
             mPresenter.destroy();
+        }
+        if(rootView != null){
+            rootView = null;
+        }
+        if (profileCallback != null){
+            profileCallback = null;
         }
     }
 }

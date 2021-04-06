@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,11 +16,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.utflnx.whokonws.R;
 import com.utflnx.whokonws.api.utils.ListObjects;
 import com.utflnx.whokonws.model.ExploreModel;
 import com.utflnx.whokonws.model.UserModel;
 import com.utflnx.whokonws.repo.explore.ExploreRepository;
+import com.utflnx.whokonws.ui.MainPresenter;
 import com.utflnx.whokonws.ui.explore.extension.ExploreAdapter;
 
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ import java.util.Set;
 public class ExploreFragment extends Fragment implements ExploreMainContract.View {
     private final String TAG = getClass().getSimpleName();
     private ExploreMainContract.Presenter mPresenter;
+    private MainPresenter.ExploreScopeListener.Callback exploreCallback;
     private ExploreRepository mRepository;
     private FragmentActivity mContext;
     private View rootView;
@@ -69,6 +73,8 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
 
         if (getArguments() != null)
             mCurrentUser = (UserModel) getArguments().getSerializable(ListObjects.KEY_CURRENT_USER);
+        if (mCurrentUser != null)
+            ListObjects.handleOnBackPressed(mContext, this); //6601b4b4-629a-4445-bd29-33ae47fd2679
 
         new ExplorePresenter(this, mRepository);
     }
@@ -116,6 +122,7 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
     @Override
     public void onError(Throwable e) {
         Log.d(TAG, "Explore error "+ e.getLocalizedMessage());
+        exploreCallback.onNotify("Sorry, "+ e.getLocalizedMessage(), Snackbar.LENGTH_LONG);
     }
     private void replaceWithList(List<ExploreModel> exploreModels) {
         mExploreAdapter.setData(exploreModels);
@@ -124,6 +131,10 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
 
     private void replaceWithEmpty() {
         ListObjects.visibleGoneView(new View[]{mContentEmpty}, mRecyclerView);
+    }
+
+    public void setExploreCallback(MainPresenter.ExploreScopeListener.Callback callback) {
+        exploreCallback = callback;
     }
 
     @Override
@@ -141,6 +152,9 @@ public class ExploreFragment extends Fragment implements ExploreMainContract.Vie
 
         if (mPresenter != null){
             mPresenter.destroy();
+        }
+        if (exploreCallback != null){
+            exploreCallback = null;
         }
     }
 }

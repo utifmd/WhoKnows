@@ -14,8 +14,8 @@ public interface RoomOwnerMainContract {
         void displayOwnerRoom(UserModel currentUserModel);
         void createRoom(RoomModel roomModel);
         void removeRoom(RoomModel roomModel);
-        void selectRoomItem(RoomModel roomModel);
-        boolean selectLongRoomItem(RoomModel roomModel, int position);
+        void selectOnRoomItemView(RoomModel roomModel);
+        boolean selectOnRoomItemDelete(RoomModel roomModel, int position);
 //
 //        void displayQuestions();
 //        void createQuestion(Quiz quiz);
@@ -31,7 +31,7 @@ public interface RoomOwnerMainContract {
         void onRoomOwnerEmpty();
         void onRoomOwnerSaved(RoomModel roomModel);
         void onRoomItemSelected(RoomModel roomModel);
-        boolean onRoomItemLongSelected(RoomModel roomModel, int pos);
+        boolean onRoomItemDeleteSelected(RoomModel roomModel, int pos);
         void onRoomDeleted(RoomModel roomModel);
         void onRoomLoaded(RoomModel roomModel);
 //        void onQuestionsLoaded(List<Quiz> questions);

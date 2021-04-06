@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,7 +58,7 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     private static class GeneralViewHolder extends RecyclerView.ViewHolder{
         TextView textTitle, textSubtitle;
         Chip chipTime, chipTrash;
-        Button btnView, btnDelete;
+        ImageView btnView, btnDelete;
 
         public GeneralViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,8 +84,9 @@ public class RoomOwnerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 chipTrash.setVisibility(View.VISIBLE);
                 btnDelete.setVisibility(View.VISIBLE);
             }
-            btnView.setOnClickListener(view -> mPresenter.selectRoomItem(itemRoomModel));
-            btnDelete.setOnClickListener(view -> mPresenter.selectLongRoomItem(itemRoomModel, position));
+
+            btnView.setOnClickListener(view -> mPresenter.selectOnRoomItemView(itemRoomModel));
+            btnDelete.setOnClickListener(view -> mPresenter.selectOnRoomItemDelete(itemRoomModel, position));
         }
     }
 }

@@ -101,7 +101,7 @@ public class QuizPresenter implements QuizMainContract.Presenter {
         participateRepository.updateCurrentParticipant(participantModel, resultModel, new ParticipantDataContract.ActionParticipantCallback() {
             @Override
             public void onParticipantResponse(ParticipantModel participant, ResultModel result) {
-                mView.onExpiredParticipantTakenQuiz(participant, result);
+                mView.onFinishParticipantTakenQuiz(participant, result);
                 mView.onProgressHide();
             }
 

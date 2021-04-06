@@ -2,7 +2,6 @@ package com.utflnx.whokonws.ui.room.ownership;
 
 import com.utflnx.whokonws.model.RoomModel;
 import com.utflnx.whokonws.model.UserModel;
-import com.utflnx.whokonws.repo.profile.ProfileDataContract;
 import com.utflnx.whokonws.repo.profile.ProfileRepository;
 import com.utflnx.whokonws.repo.quiz.QuizRepository;
 import com.utflnx.whokonws.repo.room.RoomDataContract;
@@ -109,13 +108,13 @@ public class RoomOwnerPresenter implements RoomOwnerMainContract.Presenter {
     }
 
     @Override
-    public void selectRoomItem(RoomModel roomModel) {
+    public void selectOnRoomItemView(RoomModel roomModel) {
         mView.onRoomItemSelected(roomModel);
     }
 
     @Override
-    public boolean selectLongRoomItem(RoomModel roomModel, int pos) {
-        return mView.onRoomItemLongSelected(roomModel, pos);
+    public boolean selectOnRoomItemDelete(RoomModel roomModel, int pos) {
+        return mView.onRoomItemDeleteSelected(roomModel, pos);
     }
 
     @Override

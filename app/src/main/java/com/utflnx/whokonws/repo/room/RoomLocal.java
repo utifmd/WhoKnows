@@ -11,7 +11,7 @@ import com.utflnx.whokonws.model.UserModel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RoomLocal implements RoomDataContract {
+public class RoomLocal implements RoomDataContract.LocalListener {
     private LocalService localService;
     private ExecutorService executorService;
 
@@ -23,7 +23,7 @@ public class RoomLocal implements RoomDataContract {
     }
 
     @Override
-    public void getLocalRoom(LoadedRoomCallback callBack) {
+    public void getLocalRoom(RoomDataContract.LoadedRoomCallback callBack) {
         executorService.execute(() -> {
             if (localService.getCurrentRoom() != null){
                 callBack.onRoomLoaded(localService.getCurrentRoom());
@@ -37,22 +37,4 @@ public class RoomLocal implements RoomDataContract {
     public void postLocalRoom(RoomModel roomModel) {
         executorService.execute(() -> localService.addCurrentRoom(roomModel));
     }
-
-    @Override
-    public void postPublicParticipant(ParticipantModel participantModel, ActionParticipantCallBack participantCallBack) { }
-
-    @Override
-    public void updateCurrentRoom(RoomModel currentRoom, ActionRoomCallBack roomCallBack) { }
-
-    @Override
-    public void getOwnerRoom(UserModel currentUserModel, LoadedRoomListCallback callback) { }
-
-    @Override
-    public void postOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) { }
-
-    @Override
-    public void deleteOwnerRoom(RoomModel roomModel, ActionRoomCallBack callBack) { }
-
-    @Override
-    public void getRemoteRoom(String roomId, LoadedRoomCallback callBack) { }
 }

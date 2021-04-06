@@ -4,6 +4,11 @@
     <item android:id="@+id/page_submit_room"
         android:enabled="true"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_round_add_transparent_24"
-        android:title="@string/profile"/>
+        android:icon="@drawable/ic_baseline_create_new_folder_24"
+        android:title="@string/create_room"/>
+    <item android:id="@+id/page_join_room"
+        android:enabled="true"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_follow_the_signs_24"
+        android:title="@string/join_room"/>
 </menu>
